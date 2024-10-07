@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert } from 'react-native';
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddDietEntry = ({ navigation }) => {
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Handle date selection
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
   // Validation and Save function
   const validateAndSave = () => {
     const caloriesNumber = parseInt(calories, 10);
@@ -48,6 +58,27 @@ const AddDietEntry = ({ navigation }) => {
         value={calories}
         onChangeText={setCalories}
       />
+
+      {/* Date Picker */}
+      <Text>Date:</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+        <TextInput
+          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          placeholder="Select date"
+          value={date.toLocaleDateString()}
+          editable={false}
+        />
+      </TouchableOpacity>
+
+      {/* Date Picker Display */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="inline"
+          onChange={onDateChange}
+        />
+      )}
 
       {/* Save Button */}
       <Button title="Save" onPress={validateAndSave} />
