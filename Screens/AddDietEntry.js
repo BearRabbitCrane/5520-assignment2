@@ -31,10 +31,20 @@ const AddDietEntry = ({ navigation }) => {
       return;
     }
 
+    // Check if the entry should be marked as "special"
+    let isSpecial = false;
+    if (caloriesNumber > 800) {
+      isSpecial = true;
+    }
+
     // If all validations pass, show success message
-    Alert.alert("Success", "Diet entry saved successfully!");
+    Alert.alert(
+      "Success", 
+      `Diet entry saved successfully! ${isSpecial ? "This entry is marked as special." : ""}`
+    );
     
-    // Here, you would typically save the entry, e.g., send it to the backend or update state
+    // Here, you would typically save the entry, including the special flag (e.g., send it to the backend or update state)
+    // Example: saveEntry({ description, calories: caloriesNumber, date, isSpecial });
   };
 
   // Cancel button handler: go back to the previous screen
