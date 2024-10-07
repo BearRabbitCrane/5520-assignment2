@@ -9,7 +9,8 @@ import Activities from './Screens/Activities';
 import Diet from './Screens/Diet';
 import AddActivity from './Screens/AddActivity';
 import AddDietEntry from './Screens/AddDietEntry';
-import { DietProvider } from './Context/DietContext'; // Import DietProvider
+import Settings from './Screens/Settings'; // Import Settings screen
+import { ThemeProvider } from './Context/ThemeContext'; // Import ThemeProvider
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,6 +25,8 @@ const TabNavigator = () => {
             iconName = 'bicycle';
           } else if (route.name === 'Diet') {
             iconName = 'fast-food';
+          } else if (route.name === 'Settings') {
+            iconName = 'settings';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -31,6 +34,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Activities" component={Activities} />
       <Tab.Screen name="Diet" component={Diet} />
+      <Tab.Screen name="Settings" component={Settings} /> {/* Add Settings screen */}
     </Tab.Navigator>
   );
 };
@@ -47,10 +51,10 @@ const AppNavigator = () => {
 
 export default function App() {
   return (
-    <DietProvider> 
+    <ThemeProvider> {/* Wrap the entire app in ThemeProvider */}
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
-    </DietProvider>
+    </ThemeProvider>
   );
 }
