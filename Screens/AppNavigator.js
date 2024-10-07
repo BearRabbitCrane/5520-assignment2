@@ -29,4 +29,13 @@ const TabNavigator = () => (
   </Tab.Navigator>
 );
 
+const AppNavigator = () => (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={TabNavigator} />
+        <Stack.Screen name="AddActivity" component={AddActivity} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+
 export default AppNavigator;
