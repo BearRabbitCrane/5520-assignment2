@@ -41,9 +41,21 @@ const AddActivity = ({ navigation }) => {
       return;
     }
 
+    // Check if the activity should be marked as "special"
+    let isSpecial = false;
+    if ((activityType === 'running' || activityType === 'weights') && durationNumber > 60) {
+      isSpecial = true;
+    }
+
     // If all validations pass, proceed with saving
-    Alert.alert("Success", "Activity saved successfully!");
-    // Add your saving logic here (e.g., updating context or calling an API)
+    Alert.alert(
+      "Success", 
+      `Activity saved successfully! ${isSpecial ? "This activity is marked as special." : ""}`
+    );
+
+    // You would handle saving the activity here, including setting the special flag
+    // Example: save the activity to context or send it to an API
+    // e.g., saveActivity({ activityType, duration: durationNumber, date, isSpecial });
   };
 
   return (
