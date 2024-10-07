@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { DietContext } from '../Context/DietContext'; // Import the context
+import { DietContext } from '../Context/DietContext'; // Ensure the path is correct
 
 const AddDietEntry = ({ navigation }) => {
   const [description, setDescription] = useState('');
@@ -23,13 +23,13 @@ const AddDietEntry = ({ navigation }) => {
 
     // Check if description is empty
     if (!description.trim()) {
-      Alert.alert("Invalid Input", "Please enter a valid description.");
+      alert("Please enter a valid description.");
       return;
     }
 
     // Check if calories is a valid positive number
     if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
-      Alert.alert("Invalid Input", "Please enter a valid positive number for calories.");
+      alert("Please enter a valid positive number for calories.");
       return;
     }
 
@@ -42,10 +42,9 @@ const AddDietEntry = ({ navigation }) => {
     // Add the new diet entry to the context
     addDietEntry(description, caloriesNumber, date, isSpecial);
 
-    // Show success message and navigate back to the previous screen
-    Alert.alert("Success", "Diet entry saved successfully!", [
-      { text: "OK", onPress: () => navigation.goBack() } // Navigates back to the previous screen
-    ]);
+    // Navigate back to the previous screen
+    alert("Diet entry saved successfully!");
+    navigation.goBack(); // Return to the previous screen (the correct tab will be maintained)
   };
 
   return (
@@ -94,7 +93,7 @@ const AddDietEntry = ({ navigation }) => {
       <Button title="Save" onPress={validateAndSave} />
 
       {/* Cancel Button */}
-      <Button title="Cancel" onPress={() => navigation.goBack()} />
+      <Button title="Cancel" onPress={() => navigation.goBack()} /> {/* Go back to the previous screen */}
     </View>
   );
 };
