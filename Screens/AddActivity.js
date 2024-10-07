@@ -28,34 +28,33 @@ const AddActivity = ({ navigation }) => {
 
   // Validation and Save function
   const validateAndSave = () => {
-    // Check if duration is a number and positive
     const durationNumber = parseInt(duration, 10);
     if (isNaN(durationNumber) || durationNumber <= 0) {
       Alert.alert("Invalid Input", "Please enter a valid positive number for the duration.");
       return;
     }
 
-    // Check if activityType is selected
     if (!activityType) {
       Alert.alert("Invalid Input", "Please select an activity type.");
       return;
     }
 
-    // Check if the activity should be marked as "special"
     let isSpecial = false;
     if ((activityType === 'running' || activityType === 'weights') && durationNumber > 60) {
       isSpecial = true;
     }
 
-    // If all validations pass, proceed with saving
     Alert.alert(
       "Success", 
       `Activity saved successfully! ${isSpecial ? "This activity is marked as special." : ""}`
     );
 
-    // You would handle saving the activity here, including setting the special flag
-    // Example: save the activity to context or send it to an API
-    // e.g., saveActivity({ activityType, duration: durationNumber, date, isSpecial });
+    // Save logic here, for example updating context or sending to API
+  };
+
+  // Cancel button handler: go back to the previous screen
+  const handleCancel = () => {
+    navigation.goBack(); // Navigates back to the previous screen
   };
 
   return (
@@ -108,7 +107,7 @@ const AddActivity = ({ navigation }) => {
       <Button title="Save" onPress={validateAndSave} />
 
       {/* Cancel Button */}
-      <Button title="Cancel" onPress={() => navigation.goBack()} />
+      <Button title="Cancel" onPress={handleCancel} />
     </View>
   );
 };
