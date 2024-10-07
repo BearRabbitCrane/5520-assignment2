@@ -2,10 +2,12 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ActivityContext } from '../Context/ActivityContext'; // Import the ActivityContext
 import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const AddActivity = ({ navigation }) => {
   const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
+  const { addActivity } = useContext(ActivityContext); // Access the activity context
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -46,12 +48,11 @@ const AddActivity = ({ navigation }) => {
       isSpecial = true;
     }
 
-    Alert.alert(
-      "Success", 
-      `Activity saved successfully! ${isSpecial ? "This activity is marked as special." : ""}`
-    );
+    // Add the new activity entry to the context
+    addActivity(activityType, durationNumber, date, isSpecial);
 
-    // Save logic here, for example updating context or sending to API
+    // Navigate back to the previous screen (the correct tab will be maintained)
+    Alert.alert("Success", "Activity saved successfully!", [{ text: "OK", onPress: () => navigation.goBack() }]);
   };
 
   // Cancel button handler: go back to the previous screen

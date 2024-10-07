@@ -3,14 +3,16 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons'; // For icons
+import { Ionicons } from '@expo/vector-icons';
 
 import Activities from './Screens/Activities';
 import Diet from './Screens/Diet';
 import AddActivity from './Screens/AddActivity';
 import AddDietEntry from './Screens/AddDietEntry';
-import Settings from './Screens/Settings'; // Import Settings screen
-import { ThemeProvider } from './Context/ThemeContext'; // Import ThemeProvider
+import Settings from './Screens/Settings';
+import { ActivityProvider } from './Context/ActivityContext'; // Import ActivityProvider
+import { DietProvider } from './Context/DietContext';
+import { ThemeProvider } from './Context/ThemeContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,7 +36,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Activities" component={Activities} />
       <Tab.Screen name="Diet" component={Diet} />
-      <Tab.Screen name="Settings" component={Settings} /> 
+      <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
   );
 };
@@ -52,9 +54,13 @@ const AppNavigator = () => {
 export default function App() {
   return (
     <ThemeProvider> 
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <DietProvider> 
+        <ActivityProvider> 
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </ActivityProvider>
+      </DietProvider>
     </ThemeProvider>
   );
 }
