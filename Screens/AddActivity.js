@@ -5,15 +5,29 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddActivity = ({ navigation }) => {
   const [activityType, setActivityType] = useState(null);
+  const [duration, setDuration] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
 
   return (
     <View style={{ padding: 20 }}>
       <Text>Activity Name:</Text>
       <TextInput style={{ borderWidth: 1, marginBottom: 10 }} />
 
-      
+      <Text>Duration (minutes):</Text>
+      <TextInput 
+        style={{ borderWidth: 1, marginBottom: 10 }} 
+        keyboardType="numeric"
+        value={duration}
+        onChangeText={setDuration}
+      />
 
       <Text>Activity Type:</Text>
       <DropDownPicker
@@ -32,7 +46,17 @@ const AddActivity = ({ navigation }) => {
         style={{ marginBottom: 10 }}
       />
 
-      
+      <Text>Date:</Text>
+      <Button title="Pick a date" onPress={() => setShowDatePicker(true)} />
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
+
       <Button title="Submit" onPress={() => { /* Add activity to context */ }} />
     </View>
   );
