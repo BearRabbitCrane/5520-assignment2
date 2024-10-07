@@ -18,19 +18,23 @@ const AddDietEntry = ({ navigation }) => {
   // Validation and Save function
   const validateAndSave = () => {
     const caloriesNumber = parseInt(calories, 10);
+
+    // Check if description is empty
     if (!description.trim()) {
       Alert.alert("Invalid Input", "Please enter a valid description.");
       return;
     }
+
+    // Check if calories is a valid positive number
     if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
       Alert.alert("Invalid Input", "Please enter a valid positive number for calories.");
       return;
     }
 
-    // If all validations pass, proceed with saving
+    // If all validations pass, show success message
     Alert.alert("Success", "Diet entry saved successfully!");
-
-    // Add your saving logic here (e.g., updating context or sending data to API)
+    
+    // Here, you would typically save the entry, e.g., send it to the backend or update state
   };
 
   // Cancel button handler: go back to the previous screen
