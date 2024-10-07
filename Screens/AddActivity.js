@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddActivity = ({ navigation }) => {
-  // State for the form inputs
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -20,11 +19,31 @@ const AddActivity = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Function to handle date selection
+  // Handle date selection
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
+  };
+
+  // Validation and Save function
+  const validateAndSave = () => {
+    // Check if duration is a number and positive
+    const durationNumber = parseInt(duration, 10);
+    if (isNaN(durationNumber) || durationNumber <= 0) {
+      Alert.alert("Invalid Input", "Please enter a valid positive number for the duration.");
+      return;
+    }
+
+    // Check if activityType is selected
+    if (!activityType) {
+      Alert.alert("Invalid Input", "Please select an activity type.");
+      return;
+    }
+
+    // If all validations pass, proceed with saving
+    Alert.alert("Success", "Activity saved successfully!");
+    // Add your saving logic here (e.g., updating context or calling an API)
   };
 
   return (
@@ -62,19 +81,21 @@ const AddActivity = ({ navigation }) => {
           editable={false}
         />
       </TouchableOpacity>
-      
+
       {/* Date Picker Display */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display="inline" // Ensures the picker shows inline as requested
+          display="inline"
           onChange={onDateChange}
         />
       )}
 
-      {/* Buttons */}
-      <Button title="Submit" onPress={() => {/* Handle form submission */}} />
+      {/* Save Button */}
+      <Button title="Save" onPress={validateAndSave} />
+
+      {/* Cancel Button */}
       <Button title="Cancel" onPress={() => navigation.goBack()} />
     </View>
   );
