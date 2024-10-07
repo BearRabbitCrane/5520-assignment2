@@ -34,7 +34,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Activities" component={Activities} />
       <Tab.Screen name="Diet" component={Diet} />
-      <Tab.Screen name="Settings" component={Settings} /> {/* Add Settings screen */}
+      <Tab.Screen name="Settings" component={Settings} /> 
     </Tab.Navigator>
   );
 };
@@ -51,7 +51,7 @@ const AppNavigator = () => {
 
 export default function App() {
   return (
-    <ThemeProvider> {/* Wrap the entire app in ThemeProvider */}
+    <ThemeProvider> 
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>

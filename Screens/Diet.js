@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ItemsList from '../Components/ItemsList';
+import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const Diet = ({ navigation }) => {
-  // Local state to hold diet entries (use your actual data source later)
+  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
   const [dietEntries] = useState([
     { id: 1, description: 'Apple', calories: 95, date: new Date() },
     { id: 2, description: 'Banana', calories: 105, date: new Date() },
@@ -34,10 +35,23 @@ const Diet = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Text style={[styles.text, { color: textColor }]}>Diet Entries</Text>
       <ItemsList entries={dietEntries} type="diet" />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+});
 
 export default Diet;

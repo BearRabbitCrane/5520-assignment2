@@ -1,9 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DietContext } from '../Context/DietContext'; // Ensure the path is correct
+import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const AddDietEntry = ({ navigation }) => {
+  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
@@ -48,31 +50,33 @@ const AddDietEntry = ({ navigation }) => {
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={[styles.container, { backgroundColor }]}>
       {/* Description Input */}
-      <Text>Description:</Text>
+      <Text style={[styles.text, { color: textColor }]}>Description:</Text>
       <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+        style={[styles.input, { color: textColor, borderColor: textColor }]}
         placeholder="Enter description"
         value={description}
         onChangeText={setDescription}
+        placeholderTextColor={textColor}
       />
 
       {/* Calories Input */}
-      <Text>Calories:</Text>
+      <Text style={[styles.text, { color: textColor }]}>Calories:</Text>
       <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+        style={[styles.input, { color: textColor, borderColor: textColor }]}
         placeholder="Enter calories"
         keyboardType="numeric"
         value={calories}
         onChangeText={setCalories}
+        placeholderTextColor={textColor}
       />
 
       {/* Date Picker */}
-      <Text>Date:</Text>
+      <Text style={[styles.text, { color: textColor }]}>Date:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <TextInput
-          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          style={[styles.input, { color: textColor, borderColor: textColor }]}
           placeholder="Select date"
           value={date.toLocaleDateString()}
           editable={false}
@@ -93,9 +97,26 @@ const AddDietEntry = ({ navigation }) => {
       <Button title="Save" onPress={validateAndSave} />
 
       {/* Cancel Button */}
-      <Button title="Cancel" onPress={() => navigation.goBack()} /> {/* Go back to the previous screen */}
+      <Button title="Cancel" onPress={() => navigation.goBack()} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+});
 
 export default AddDietEntry;

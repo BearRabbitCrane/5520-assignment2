@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const AddActivity = ({ navigation }) => {
+  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -58,9 +60,9 @@ const AddActivity = ({ navigation }) => {
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={[styles.container, { backgroundColor }]}>
       {/* Activity Type Dropdown */}
-      <Text>Activity Type:</Text>
+      <Text style={[styles.text, { color: textColor }]}>Activity Type:</Text>
       <DropDownPicker
         open={open}
         value={activityType}
@@ -73,20 +75,21 @@ const AddActivity = ({ navigation }) => {
       />
 
       {/* Duration Input */}
-      <Text>Duration (minutes):</Text>
+      <Text style={[styles.text, { color: textColor }]}>Duration (minutes):</Text>
       <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+        style={[styles.input, { color: textColor, borderColor: textColor }]}
         placeholder="Enter duration"
         keyboardType="numeric"
         value={duration}
         onChangeText={setDuration}
+        placeholderTextColor={textColor}
       />
 
       {/* Date Picker */}
-      <Text>Date:</Text>
+      <Text style={[styles.text, { color: textColor }]}>Date:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <TextInput
-          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          style={[styles.input, { color: textColor, borderColor: textColor }]}
           placeholder="Select date"
           value={date.toLocaleDateString()}
           editable={false}
@@ -111,5 +114,22 @@ const AddActivity = ({ navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+});
 
 export default AddActivity;
