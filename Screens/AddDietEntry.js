@@ -75,7 +75,7 @@ const AddDietEntry = ({ navigation }) => {
         <DateTimePicker
           value={date}
           mode="date"
-          display="inline"
+          display="inline" // Ensures the calendar is shown inline as requested
           onChange={onDateChange}
         />
       )}

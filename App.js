@@ -5,8 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; // For icons
 
-import Activities from './Screens/Activities'; // Your Activity screen
-import AddActivity from './Screens/AddActivity'; // Add Activity screen
+import Activities from './Screens/Activities'; // Activity screen
+import Diet from './Screens/Diet'; // Diet screen
+import AddActivity from './Screens/AddActivity'; // AddActivity screen
+import AddDietEntry from './Screens/AddDietEntry'; // AddDietEntry screen
 
 // Create the Stack and Tab Navigators
 const Stack = createStackNavigator();
@@ -19,27 +21,45 @@ const TabNavigator = () => {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Activity') {
-            iconName = 'bicycle'; // Example icon for Activity screen
+          if (route.name === 'Activities') {
+            iconName = 'bicycle'; // Icon for Activity tab
           } else if (route.name === 'Diet') {
-            iconName = 'fast-food'; // Example icon for Diet screen
+            iconName = 'fast-food'; // Icon for Diet tab
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Activity" component={Activity} />
+      <Tab.Screen name="Activities" component={Activities} />
       <Tab.Screen name="Diet" component={Diet} />
     </Tab.Navigator>
   );
 };
 
-// Stack Navigator for adding screens like AddActivity
+// Stack Navigator for handling "AddActivity" and "AddDietEntry" screens
 const AppNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="AddActivity" component={AddActivity} options={{ title: 'Add Activity' }} />
+      {/* Main Tab Navigation */}
+      <Stack.Screen
+        name="Home"
+        component={TabNavigator}
+        options={{ headerShown: false }} // Hide header for the tab navigation
+      />
+
+      {/* Add Activity Screen */}
+      <Stack.Screen
+        name="AddActivity"
+        component={AddActivity}
+        options={{ title: 'Add Activity' }} // Set a title for AddActivity screen
+      />
+
+      {/* Add Diet Entry Screen */}
+      <Stack.Screen
+        name="AddDietEntry"
+        component={AddDietEntry}
+        options={{ title: 'Add Diet Entry' }} // Set a title for AddDietEntry screen
+      />
     </Stack.Navigator>
   );
 };
