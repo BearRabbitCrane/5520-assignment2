@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { DietContext } from '../Context/DietContext'; // Import the context
 
 const AddDietEntry = ({ navigation }) => {
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { addDietEntry } = useContext(DietContext); // Access the context
 
   // Handle date selection
   const onDateChange = (event, selectedDate) => {
@@ -37,19 +39,13 @@ const AddDietEntry = ({ navigation }) => {
       isSpecial = true;
     }
 
-    // If all validations pass, show success message
-    Alert.alert(
-      "Success", 
-      `Diet entry saved successfully! ${isSpecial ? "This entry is marked as special." : ""}`
-    );
-    
-    // Here, you would typically save the entry, including the special flag (e.g., send it to the backend or update state)
-    // Example: saveEntry({ description, calories: caloriesNumber, date, isSpecial });
-  };
+    // Add the new diet entry to the context
+    addDietEntry(description, caloriesNumber, date, isSpecial);
 
-  // Cancel button handler: go back to the previous screen
-  const handleCancel = () => {
-    navigation.goBack();
+    // Show success message and navigate back to the previous screen
+    Alert.alert("Success", "Diet entry saved successfully!", [
+      { text: "OK", onPress: () => navigation.goBack() } // Navigates back to the previous screen
+    ]);
   };
 
   return (
@@ -98,7 +94,7 @@ const AddDietEntry = ({ navigation }) => {
       <Button title="Save" onPress={validateAndSave} />
 
       {/* Cancel Button */}
-      <Button title="Cancel" onPress={handleCancel} />
+      <Button title="Cancel" onPress={() => navigation.goBack()} />
     </View>
   );
 };
