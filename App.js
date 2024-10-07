@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Activities from './Screens/Activities';
+import AddActivity from './Screens/AddActivity'; // You'll add this later
+import { NavigationContainer } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons'; // For icons
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const TabNavigator = () => (
+  <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+        if (route.name === 'Activities') {
+          iconName = 'bicycle'; // Add appropriate icon
+        } else if (route.name === 'Diet') {
+          iconName = 'fast-food'; // Add appropriate icon
+        }
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+    })}
+  >
+    <Tab.Screen name="Activities" component={Activities} />
+    <Tab.Screen name="Diet" component={Diet} />
+  </Tab.Navigator>
+);
+
+const AppNavigator = () => (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={TabNavigator} />
+        <Stack.Screen name="AddActivity" component={AddActivity} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default AppNavigator;
