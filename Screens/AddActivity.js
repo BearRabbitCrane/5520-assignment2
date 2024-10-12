@@ -2,11 +2,11 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Platform, Alert, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ActivityContext } from '../Context/ActivityContext'; // Import the ActivityContext
+import { ActivityContext } from '../Context/ActivityContext'; // Import ActivityContext
 import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const AddActivity = ({ navigation }) => {
-  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
+  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access theme context
   const { addActivity } = useContext(ActivityContext); // Access the activity context
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
@@ -60,9 +60,19 @@ const AddActivity = ({ navigation }) => {
     navigation.goBack(); // Navigates back to the previous screen
   };
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Dark purple background from ThemeContext
+      },
+      headerTitleStyle: {
+        color: textColor, // White text color from ThemeContext
+      },
+    });
+  }, [navigation, headerColor, textColor]);
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {/* Activity Type Dropdown */}
       <Text style={[styles.text, { color: textColor }]}>Activity Type:</Text>
       <DropDownPicker
         open={open}
@@ -75,7 +85,6 @@ const AddActivity = ({ navigation }) => {
         placeholder="Select Activity Type"
       />
 
-      {/* Duration Input */}
       <Text style={[styles.text, { color: textColor }]}>Duration (minutes):</Text>
       <TextInput
         style={[styles.input, { color: textColor, borderColor: textColor }]}
@@ -86,7 +95,6 @@ const AddActivity = ({ navigation }) => {
         placeholderTextColor={textColor}
       />
 
-      {/* Date Picker */}
       <Text style={[styles.text, { color: textColor }]}>Date:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <TextInput
@@ -97,7 +105,6 @@ const AddActivity = ({ navigation }) => {
         />
       </TouchableOpacity>
 
-      {/* Date Picker Display */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -107,10 +114,7 @@ const AddActivity = ({ navigation }) => {
         />
       )}
 
-      {/* Save Button */}
       <Button title="Save" onPress={validateAndSave} />
-
-      {/* Cancel Button */}
       <Button title="Cancel" onPress={handleCancel} />
     </View>
   );

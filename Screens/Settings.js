@@ -2,8 +2,20 @@ import React, { useContext } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
-const Settings = () => {
-  const { isDarkTheme, toggleTheme, backgroundColor, textColor } = useContext(ThemeContext); // Access the theme context
+const Settings = ({ navigation }) => {
+  const { isDarkTheme, toggleTheme, backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access the theme context
+
+  // Apply header style based on theme
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Set the header background color from ThemeContext
+      },
+      headerTitleStyle: {
+        color: textColor, // Set the header text color
+      },
+    });
+  }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>

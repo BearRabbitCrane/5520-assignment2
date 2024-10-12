@@ -12,10 +12,12 @@ export const ThemeProvider = ({ children }) => {
     setIsDarkTheme(!isDarkTheme);
   };
 
-  // Theme values based on the current theme
+  // Purple theme values based on the current theme
   const theme = {
-    backgroundColor: isDarkTheme ? '#333' : '#fff',
-    textColor: isDarkTheme ? '#fff' : '#000',
+    backgroundColor: isDarkTheme ? '#bf80ff' : '#d1c4e9', // Dark and light purple backgrounds
+    textColor:  '#ffffff',        // White text for dark theme, black for light theme
+    headerColor: '#4527a0',      // Darker purple for headers
+    tabBarColor: '#4527a0',      // Dark purple for the tab bar
     isDarkTheme,
     toggleTheme
   };

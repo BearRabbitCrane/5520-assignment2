@@ -32,6 +32,11 @@ const TabNavigator = () => {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: '#1E90FF', // Active icon text color
+        tabBarInactiveTintColor: '#ffffff', // Inactive icon text color
+        tabBarStyle: {
+          backgroundColor: '#4527a0', // Dark purple background for the tab bar
+        },
       })}
     >
       <Tab.Screen name="Activities" component={Activities} />

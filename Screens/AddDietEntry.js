@@ -1,41 +1,50 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { DietContext } from '../Context/DietContext'; // Ensure the path is correct
-import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
+import { DietContext } from '../Context/DietContext';
+import { ThemeContext } from '../Context/ThemeContext';
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
+  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access theme context
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const { addDietEntry } = useContext(DietContext); // Access the context
+  const { addDietEntry } = useContext(DietContext); // Access diet context
 
-  // Handle date selection
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Use headerColor from ThemeContext
+      },
+      headerTitleStyle: {
+        color: textColor, // Use textColor from ThemeContext
+      },
+    });
+  }, [navigation, headerColor, textColor]);
+
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
   };
 
-  // Validation and Save function
   const validateAndSave = () => {
     const caloriesNumber = parseInt(calories, 10);
 
-    // Check if description is empty
+    // Validate description
     if (!description.trim()) {
-      alert("Please enter a valid description.");
+      alert('Please enter a valid description.');
       return;
     }
 
-    // Check if calories is a valid positive number
+    // Validate calories
     if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
-      alert("Please enter a valid positive number for calories.");
+      alert('Please enter a valid positive number for calories.');
       return;
     }
 
-    // Check if the entry should be marked as "special"
+    // Check if the entry should be marked as special
     let isSpecial = false;
     if (caloriesNumber > 800) {
       isSpecial = true;
@@ -44,8 +53,8 @@ const AddDietEntry = ({ navigation }) => {
     // Add the new diet entry to the context
     addDietEntry(description, caloriesNumber, date, isSpecial);
 
-    // Navigate back to the previous screen
-    alert("Diet entry saved successfully!");
+    // Show success alert and navigate back
+    alert('Diet entry saved successfully!');
     navigation.goBack(); // Return to the previous screen (the correct tab will be maintained)
   };
 
@@ -83,20 +92,17 @@ const AddDietEntry = ({ navigation }) => {
         />
       </TouchableOpacity>
 
-      {/* Date Picker Display */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display="inline" // Ensures the calendar is shown inline as requested
+          display="inline"
           onChange={onDateChange}
         />
       )}
 
-      {/* Save Button */}
+      {/* Save and Cancel Buttons */}
       <Button title="Save" onPress={validateAndSave} />
-
-      {/* Cancel Button */}
       <Button title="Cancel" onPress={() => navigation.goBack()} />
     </View>
   );

@@ -5,7 +5,7 @@ import ItemsList from '../Components/ItemsList';
 import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const Diet = ({ navigation }) => {
-  const { backgroundColor, textColor } = useContext(ThemeContext); // Access theme context
+  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access theme context
   const [dietEntries] = useState([
     { id: 1, description: 'Apple', calories: 95, date: new Date() },
     { id: 2, description: 'Banana', calories: 105, date: new Date() },
@@ -31,8 +31,14 @@ const Diet = ({ navigation }) => {
           />
         </View>
       ),
+      headerStyle: {
+        backgroundColor: headerColor, // Use headerColor from ThemeContext
+      },
+      headerTitleStyle: {
+        color: textColor, // Use textColor from ThemeContext
+      },
     });
-  }, [navigation]);
+  }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
