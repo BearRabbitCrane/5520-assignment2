@@ -11,7 +11,7 @@ const ItemsList = ({ entries, type }) => {
         {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
       </View>
       <View style={styles.entryInfo}>
-        <View style={[styles.infoBox, { width: 150 }]}> 
+        <View style={[styles.infoBox, { width: 135 }]}> 
           <Text style={styles.infoText}>
             {new Date(item.date).toLocaleDateString('en-US', {
               weekday: 'short', // e.g., Mon
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: '#000000',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   entryName: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#ffffff',
     fontWeight: '500',
   },

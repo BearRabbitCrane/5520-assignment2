@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { ThemeContext } from '../Context/ThemeContext';
-import { ActivityContext } from '../Context/ActivityContext'; // Assuming you have this context
+import { ActivityContext } from '../Context/ActivityContext'; 
 import ItemsList from '../Components/ItemsList'; // Import ItemsList
 
 const Activities = ({ navigation }) => {

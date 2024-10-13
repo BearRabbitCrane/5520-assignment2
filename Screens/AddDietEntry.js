@@ -71,14 +71,13 @@ const AddDietEntry = ({ navigation }) => {
         placeholderTextColor={textColor}
       />
       <Text style={[styles.text]}>Date *:</Text>
-      <Pressable onPress={() => setShowDatePicker(true)}>
-        <TextInput
-          style={styles.input}
-          placeholder="Select date"
-          value={date.toLocaleDateString()}
-          editable={false}
-        />
-      </Pressable>
+      <TextInput
+        style={[styles.input]}
+        placeholder="Select date"
+        value={date.toLocaleDateString()} // Display the date
+        editable={false} // Prevent typing
+        onPressIn={() => setShowDatePicker(true)} // Trigger date picker when tapped
+      />
       {showDatePicker && (
         <DateTimePicker
           value={date}

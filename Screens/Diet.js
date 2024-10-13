@@ -1,14 +1,12 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
+import React, { useContext } from 'react';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { ThemeContext } from '../Context/ThemeContext';
+import { DietContext } from '../Context/DietContext'; // Import DietContext
+import ItemsList from '../Components/ItemsList'; // Import ItemsList
 
 const Diet = ({ navigation }) => {
   const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access theme context
-
-  const [dietEntries] = useState([
-    { id: 1, description: 'Apple', calories: 95, date: 'Tue Sep 17 2024' },
-    { id: 2, description: 'Lunch', calories: 900, date: 'Wed Sep 25 2024', isSpecial: true },
-  ]);
+  const { dietEntries } = useContext(DietContext); // Access dietEntries from DietContext
 
   // Set the "Add" button to the top right and customize header style
   React.useLayoutEffect(() => {
@@ -18,45 +16,28 @@ const Diet = ({ navigation }) => {
           onPress={() => navigation.navigate('AddDietEntry')}
           style={({ pressed }) => [
             {
-              backgroundColor: pressed ? '#1E90FF' : 'transparent', // Blue background when pressed
+              backgroundColor: pressed ? '#1E90FF' : 'transparent',
               paddingHorizontal: 10,
               paddingVertical: 5,
               borderRadius: 5,
             },
           ]}
         >
-          <Text style={styles.addButton}>
-            Add
-          </Text>
+          <Text style={styles.addButton}>Add</Text>
         </Pressable>
       ),
       headerStyle: {
-        backgroundColor: headerColor, // Set header background color
+        backgroundColor: headerColor,
       },
       headerTitleStyle: {
-        color: textColor, // Set header text color
+        color: textColor,
       },
     });
   }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {dietEntries.map(entry => (
-        <View key={entry.id} style={styles.entryCard}>
-          <View style={styles.entryNameContainer}>
-            <Text style={[styles.entryName, { color: textColor }]}>{entry.description}</Text>
-            {entry.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
-          </View>
-          <View style={styles.entryInfo}>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>{entry.date}</Text>
-            </View>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>{entry.calories} kcal</Text>
-            </View>
-          </View>
-        </View>
-      ))}
+      <ItemsList entries={dietEntries} type="diet" />
     </View>
   );
 };
@@ -66,47 +47,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  entryCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#4527a0',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-  },
-  entryNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  entryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  infoBox: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    marginLeft: 5,
-  },
-  infoText: {
-    color: '#000000',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  entryName: {
-    fontSize: 18,
-    color: '#ffffff',
-  },
-  specialIcon: {
-    marginLeft: 5,
-    color: 'yellow',
-    fontSize: 18,
-  },
   addButton: {
     fontSize: 16,
-    color: '#ffffff', 
+    color: '#ffffff',
   },
 });
 
