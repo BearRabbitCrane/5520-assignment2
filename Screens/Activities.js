@@ -1,30 +1,39 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // For icons
-import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { ThemeContext } from '../Context/ThemeContext';
 
 const Activities = ({ navigation }) => {
   const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access the theme context
 
-  // Sample activities (replace with context data if needed)
   const [activities] = useState([
     { id: 1, name: 'Yoga', duration: 60, date: 'Mon Sep 16 2024' },
     { id: 2, name: 'Weights', duration: 120, date: 'Mon Jul 15 2024', isSpecial: true },
   ]);
 
-  // Set "Add" button to the top right and customize header style
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('AddActivity')}>
-          <Text style={styles.addButton}>Add</Text>
-        </TouchableOpacity>
+        <Pressable
+          onPress={() => navigation.navigate('AddActivity')}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? '#1E90FF' : 'transparent', // Blue background when pressed
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: 5,
+            },
+          ]}
+        >
+          <Text style={styles.addButton}>
+            Add
+          </Text>
+        </Pressable>
       ),
       headerStyle: {
-        backgroundColor: headerColor, // Dark purple background for header from ThemeContext
+        backgroundColor: headerColor, // Set header background color
       },
       headerTitleStyle: {
-        color: textColor, // Use textColor from ThemeContext
+        color: textColor, // Set header text color
       },
     });
   }, [navigation, headerColor, textColor]);
@@ -35,11 +44,15 @@ const Activities = ({ navigation }) => {
         <View key={activity.id} style={styles.activityCard}>
           <View style={styles.activityNameContainer}>
             <Text style={[styles.activityName, { color: textColor }]}>{activity.name}</Text>
-            {activity.isSpecial && <Ionicons name="warning" size={18} color="yellow" style={styles.specialIcon} />}
+            {activity.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
           </View>
           <View style={styles.activityInfo}>
-            <Text style={[styles.activityDate, { color: textColor }]}>{activity.date}</Text>
-            <Text style={[styles.activityDuration, { color: textColor }]}>{activity.duration} min</Text>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoText}>{activity.date}</Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoText}>{activity.duration} min</Text>
+            </View>
           </View>
         </View>
       ))}
@@ -52,16 +65,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  addButton: {
-    fontSize: 18,
-    color: '#1E90FF', // Blue for the "Add" button
-    marginRight: 15,
-  },
   activityCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#4527a0', // Darker purple for activity cards
+    backgroundColor: '#4527a0',
     borderRadius: 8,
     padding: 15,
     marginBottom: 15,
@@ -74,13 +82,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  activityDate: {
-    fontSize: 14,
-    marginRight: 10, // Add space between date and duration
+  infoBox: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    marginLeft: 5,
   },
-  activityDuration: {
+  infoText: {
+    color: '#000000',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  activityName: {
+    fontSize: 18,
+    color: '#ffffff',
+  },
+  specialIcon: {
+    marginLeft: 5,
+    color: 'yellow',
+    fontSize: 18,
+  },
+  addButton: {
+    fontSize: 16,
+    color: '#ffffff', 
   },
 });
 
