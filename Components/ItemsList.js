@@ -6,17 +6,22 @@ const ItemsList = ({ entries, type }) => {
     <View style={styles.entryCard}>
       <View style={styles.entryNameContainer}>
         <Text style={styles.entryName}>
-          {type === 'activity' ? item.activityType : item.description}  {/* Correctly display the name or description */}
+          {type === 'activity' ? item.activityType : item.description} 
         </Text>
         {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
       </View>
       <View style={styles.entryInfo}>
-        <View style={styles.infoBox}>
+        <View style={[styles.infoBox, { width: 150 }]}> 
           <Text style={styles.infoText}>
-            {new Date(item.date).toLocaleDateString()} {/* Format the date */}
+            {new Date(item.date).toLocaleDateString('en-US', {
+              weekday: 'short', // e.g., Mon
+              year: 'numeric',
+              month: 'short',  // e.g., Sep
+              day: 'numeric',
+            })} 
           </Text>
         </View>
-        <View style={styles.infoBox}>
+        <View style={[styles.infoBox, { width: 70 }]}>  
           <Text style={styles.infoText}>
             {type === 'activity' ? `${item.duration} min` : `${item.calories} kcal`}
           </Text>
@@ -54,14 +59,15 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     backgroundColor: '#ffffff',
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     paddingVertical: 5,
     borderRadius: 5,
     marginLeft: 5,
+    alignItems: 'center', // Center the text inside the box
   },
   infoText: {
     color: '#000000',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   entryName: {

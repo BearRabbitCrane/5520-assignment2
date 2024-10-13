@@ -5,20 +5,20 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { ActivityContext } from '../Context/ActivityContext'; 
 import { ThemeContext } from '../Context/ThemeContext';
 
-const AddActivity = ({ navigation }) => {  
+const AddActivity = ({ navigation }) => {
   const { backgroundColor, textColor, headerColor } = useContext(ThemeContext);
   const { addActivity } = useContext(ActivityContext);
   
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
-    { label: 'Walking', value: 'walking' },
-    { label: 'Running', value: 'running' },
-    { label: 'Swimming', value: 'swimming' },
-    { label: 'Weights', value: 'weights' },
-    { label: 'Yoga', value: 'yoga' },
-    { label: 'Cycling', value: 'cycling' },
-    { label: 'Hiking', value: 'hiking' }
+    { label: 'Walking', value: 'Walking' },
+    { label: 'Running', value: 'Running' },
+    { label: 'Swimming', value: 'Swimming' },
+    { label: 'Weights', value: 'Weights' },
+    { label: 'Yoga', value: 'Yoga' },
+    { label: 'Cycling', value: 'Cycling' },
+    { label: 'Hiking', value: 'Hiking' }
   ]);
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
@@ -26,7 +26,7 @@ const AddActivity = ({ navigation }) => {
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios');  // Maintain picker visibility for iOS
+    setShowDatePicker(false); // Ensure picker is hidden after selection or cancel
     setDate(currentDate);
   };
 
@@ -41,7 +41,7 @@ const AddActivity = ({ navigation }) => {
       return;
     }
     let isSpecial = false;
-    if ((activityType === 'running' || activityType === 'weights') && durationNumber > 60) {
+    if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
       isSpecial = true;
     }
     addActivity(activityType, durationNumber, date, isSpecial);
@@ -87,21 +87,19 @@ const AddActivity = ({ navigation }) => {
         placeholderTextColor={textColor}
       />
       <Text style={[styles.text]}>Date *:</Text>
-      <Pressable onPress={() => setShowDatePicker(true)}>
-        <TextInput
-          style={[styles.input]}
-          placeholder="Select date"
-          value={date.toLocaleDateString()}
-          editable={false} 
-        />
-      </Pressable>
+      <TextInput
+        style={[styles.input]}
+        placeholder="Select date"
+        value={date.toLocaleDateString()} // Display the date
+        editable={false} // Prevent typing
+        onPressIn={() => setShowDatePicker(true)} // Trigger date picker when tapped
+      />
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={onDateChange}
-          onCancel={() => setShowDatePicker(false)}  // Reset picker visibility on cancel
         />
       )}
       <View style={styles.flexSpacer} />
