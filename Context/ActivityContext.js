@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 
 // Create ActivityContext
 export const ActivityContext = createContext();
@@ -11,16 +11,17 @@ export const ActivityProvider = ({ children }) => {
   ]);
 
   // Function to add a new activity entry
-  const addActivity = (activityType, duration, date, isSpecial) => {
+  const addActivity = useCallback((activityType, duration, date, isSpecial) => {
     const newActivity = {
-      id: activities.length + 1,
+      id: activities.length + 1, // Increment ID based on current list length
       activityType,
       duration,
-      date,
+      date, // Ensure date is passed correctly
       isSpecial,
     };
-    setActivities([...activities, newActivity]);
-  };
+    
+    setActivities((prevActivities) => [...prevActivities, newActivity]); // Use function form of setState
+  }, [activities]);
 
   return (
     <ActivityContext.Provider value={{ activities, addActivity }}>
