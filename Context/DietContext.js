@@ -6,8 +6,8 @@ export const DietContext = createContext();
 // Create the provider component
 export const DietProvider = ({ children }) => {
   const [dietEntries, setDietEntries] = useState([
-    { id: 1, description: 'Apple', calories: 95, date: new Date() },
-    { id: 2, description: 'Banana', calories: 105, date: new Date() },
+    //{ id: 1, description: 'Apple', calories: 95, date: new Date() },
+    //{ id: 2, description: 'Banana', calories: 105, date: new Date() },
   ]);
 
   // Function to add a new diet entry

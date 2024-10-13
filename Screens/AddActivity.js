@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 17,
     color: '#4c0080',
+    backgroundColor: 'white',
   },
   dropdowninput: {
     fontSize: 18,

@@ -1,109 +1,121 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DietContext } from '../Context/DietContext';
 import { ThemeContext } from '../Context/ThemeContext';
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); // Access theme context
+  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); 
+  const { addDietEntry } = useContext(DietContext); 
+
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const { addDietEntry } = useContext(DietContext); // Access diet context
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
-        backgroundColor: headerColor, // Use headerColor from ThemeContext
+        backgroundColor: headerColor, 
       },
       headerTitleStyle: {
-        color: textColor, // Use textColor from ThemeContext
+        color: textColor, 
       },
     });
   }, [navigation, headerColor, textColor]);
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios');
+    setShowDatePicker(false); 
     setDate(currentDate);
   };
 
   const validateAndSave = () => {
     const caloriesNumber = parseInt(calories, 10);
-
-    // Validate description
     if (!description.trim()) {
-      alert('Please enter a valid description.');
+      Alert.alert('Invalid Input', 'Please enter a valid description.');
       return;
     }
-
-    // Validate calories
     if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
-      alert('Please enter a valid positive number for calories.');
+      Alert.alert('Invalid Input', 'Please enter a valid positive number for calories.');
       return;
     }
-
-    // Check if the entry should be marked as special
-    let isSpecial = false;
-    if (caloriesNumber > 800) {
-      isSpecial = true;
-    }
-
-    // Add the new diet entry to the context
+    let isSpecial = caloriesNumber > 800;
     addDietEntry(description, caloriesNumber, date, isSpecial);
+    Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+  };
 
-    // Show success alert and navigate back
-    alert('Diet entry saved successfully!');
-    navigation.goBack(); // Return to the previous screen (the correct tab will be maintained)
+  const handleCancel = () => {
+    navigation.goBack();
   };
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {/* Description Input */}
-      <Text style={[styles.text, { color: textColor }]}>Description:</Text>
+      <Text style={[styles.text]}>Description *:</Text>
       <TextInput
-        style={[styles.input, { color: textColor, borderColor: textColor }]}
+        style={[styles.input, styles.descriptionInput]}
         placeholder="Enter description"
         value={description}
         onChangeText={setDescription}
         placeholderTextColor={textColor}
+        multiline={true} // Enable multiline input
+        textAlignVertical="top" // Align text to the top
       />
-
-      {/* Calories Input */}
-      <Text style={[styles.text, { color: textColor }]}>Calories:</Text>
+      <Text style={styles.text}>Calories *:</Text>
       <TextInput
-        style={[styles.input, { color: textColor, borderColor: textColor }]}
+        style={styles.input}
         placeholder="Enter calories"
         keyboardType="numeric"
         value={calories}
         onChangeText={setCalories}
         placeholderTextColor={textColor}
       />
-
-      {/* Date Picker */}
-      <Text style={[styles.text, { color: textColor }]}>Date:</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+      <Text style={[styles.text]}>Date *:</Text>
+      <Pressable onPress={() => setShowDatePicker(true)}>
         <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
+          style={styles.input}
           placeholder="Select date"
           value={date.toLocaleDateString()}
           editable={false}
         />
-      </TouchableOpacity>
-
+      </Pressable>
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display="inline"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={onDateChange}
         />
       )}
-
-      {/* Save and Cancel Buttons */}
-      <Button title="Save" onPress={validateAndSave} />
-      <Button title="Cancel" onPress={() => navigation.goBack()} />
+      <View style={styles.flexSpacer} />
+      <View style={styles.buttonContainer}>
+        <Pressable
+          onPress={handleCancel}
+          style={({ pressed }) => [
+            styles.button,
+            pressed ? styles.pressedButton : styles.noBackgroundButton
+          ]}
+        >
+          {({ pressed }) => (
+            <Text style={[styles.buttonText, { color: pressed ? '#fff' : '#1E90FF' }]}>
+              Cancel
+            </Text>
+          )}
+        </Pressable>
+        <Pressable
+          onPress={validateAndSave}
+          style={({ pressed }) => [
+            styles.button,
+            pressed ? styles.pressedButton : styles.noBackgroundButton
+          ]}
+        >
+          {({ pressed }) => (
+            <Text style={[styles.buttonText, { color: pressed ? '#fff' : '#1E90FF' }]}>
+              Save
+            </Text>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -116,12 +128,51 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     marginBottom: 10,
+    fontWeight: '500',
+    color: '#4c0080',
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 2,
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    borderColor: '#4c0080',
+    fontWeight: '400',
+    fontSize: 17,
+    color: '#4c0080',
+    backgroundColor: 'white',
+  },
+  descriptionInput: {  // Added new style for description input
+    height: 130,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 150,
+  },
+  flexSpacer: {
+    flex: 1,
+  },
+  button: {
+    width: '40%',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 5,
+  },
+  noBackgroundButton: {
+    backgroundColor: 'transparent',
+  },
+  pressedButton: {
+    backgroundColor: '#1E90FF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
