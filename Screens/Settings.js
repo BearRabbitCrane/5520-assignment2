@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext
 
 const Settings = ({ navigation }) => {
@@ -22,7 +22,19 @@ const Settings = ({ navigation }) => {
       <Text style={[styles.text, { color: textColor }]}>
         Current Theme: {isDarkTheme ? 'Dark' : 'Light'}
       </Text>
-      <Button title="Toggle Theme" onPress={toggleTheme} />
+      <Pressable
+        onPress={toggleTheme}
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: pressed ? '#1E90FF' : '#4527a0' }, // Change background color when pressed
+        ]}
+      >
+        {({ pressed }) => (
+          <Text style={[styles.buttonText, { color: pressed ? '#fff' : '#ffffff' }]}>
+            Toggle Theme
+          </Text>
+        )}
+      </Pressable>
     </View>
   );
 };
@@ -36,6 +48,17 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     marginBottom: 20,
+    fontWeight: 'bold'
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    elevation: 2,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
