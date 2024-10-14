@@ -1,92 +1,106 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Pressable, Alert, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { DietContext } from '../Context/DietContext';
-import { ThemeContext } from '../Context/ThemeContext';
+import { DietContext } from '../Context/DietContext'; // Import DietContext to manage diet entries
+import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext for dynamic theming
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext); 
-  const { addDietEntry } = useContext(DietContext); 
+  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext); // Get theme values from ThemeContext
+  const { addDietEntry } = useContext(DietContext); // Access addDietEntry function from DietContext
 
-  const [description, setDescription] = useState('');
-  const [calories, setCalories] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // Local state to manage diet entry input values
+  const [description, setDescription] = useState(''); // Description of the diet entry
+  const [calories, setCalories] = useState(''); // Calories input
+  const [date, setDate] = useState(new Date()); // Date selected for the diet entry
+  const [showDatePicker, setShowDatePicker] = useState(false); // Control visibility of DateTimePicker
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerStyle: {
-        backgroundColor: headerColor, 
-      },
-      headerTitleStyle: {
-        color: textColor, 
-      },
-    });
-  }, [navigation, headerColor, textColor]);
-
+  // Handle changes when a new date is selected from DateTimePicker
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(false); 
-    setDate(currentDate);
+    setShowDatePicker(false); // Hide DateTimePicker after a date is selected
+    setDate(currentDate); // Update date state
   };
 
+  // Function to validate user input and save the diet entry
   const validateAndSave = () => {
-    const caloriesNumber = parseInt(calories, 10);
+    const caloriesNumber = parseInt(calories, 10); // Parse calories input to an integer
     if (!description.trim()) {
-      Alert.alert('Invalid Input', 'Please enter a valid description.');
+      Alert.alert('Invalid Input', 'Please enter a valid description.'); // Show error if description is empty
       return;
     }
     if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
-      Alert.alert('Invalid Input', 'Please enter a valid positive number for calories.');
+      Alert.alert('Invalid Input', 'Please enter a valid positive number for calories.'); // Show error for invalid calories
       return;
     }
-    let isSpecial = caloriesNumber > 800;
-    addDietEntry(description, caloriesNumber, date, isSpecial);
-    Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+    let isSpecial = caloriesNumber > 800; // Mark diet entry as special if calories > 800
+    addDietEntry(description, caloriesNumber, date, isSpecial); // Add the diet entry using the context function
+    Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]); // Navigate back after success
   };
 
+  // Handle cancel action
   const handleCancel = () => {
-    navigation.goBack();
+    navigation.goBack(); // Go back to the previous screen
   };
+
+  // Set dynamic header styles based on the current theme
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Header background color based on theme
+      },
+      headerTitleStyle: {
+        color: textColor, // Header text color based on theme
+      },
+    });
+  }, [navigation, headerColor, textColor]); // Trigger when navigation or theme values change
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      {/* Description Input */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Description *:</Text>
       <TextInput
-        style={[styles.input, styles.descriptionInput]} 
+        style={[styles.input, styles.descriptionInput]} // Style for multiline input
         placeholder="Enter description"
         value={description}
         onChangeText={setDescription}
-        placeholderTextColor={textColor}
-        multiline={true} 
-        textAlignVertical="top" 
+        placeholderTextColor={textColor} // Placeholder text color based on theme
+        multiline={true} // Enable multiline input
+        textAlignVertical="top" // Align text to the top for multiline input
       />
+
+      {/* Calories Input */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Calories *:</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter calories"
-        keyboardType="numeric"
+        keyboardType="numeric" // Ensure only numbers can be entered
         value={calories}
         onChangeText={setCalories}
-        placeholderTextColor={textColor}
+        placeholderTextColor={textColor} // Placeholder text color based on theme
       />
+
+      {/* Date Picker */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Date *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Select date"
-        value={date.toLocaleDateString()} 
-        editable={false} 
-        onPressIn={() => setShowDatePicker(true)} 
+        value={date.toLocaleDateString()} // Display selected date
+        editable={false} // Prevent manual editing of the date input
+        onPressIn={() => setShowDatePicker(true)} // Show DateTimePicker on press
       />
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={onDateChange}
+          display={Platform.OS === 'ios' ? 'inline' : 'default'} // Show inline picker on iOS
+          onChange={onDateChange} // Update date on selection
         />
       )}
+
+      {/* Spacer to separate form inputs from buttons */}
       <View style={styles.flexSpacer} />
+
+      {/* Cancel and Save Buttons */}
       <View style={styles.buttonContainer}>
         <Pressable
           onPress={handleCancel}
@@ -119,6 +133,7 @@ const AddDietEntry = ({ navigation }) => {
   );
 };
 
+// Styles for AddDietEntry screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -141,7 +156,7 @@ const styles = StyleSheet.create({
     color: '#4c0080',
     backgroundColor: 'white',
   },
-  descriptionInput: { 
+  descriptionInput: { // Style for multiline description input
     height: 130,
   },
   buttonContainer: {

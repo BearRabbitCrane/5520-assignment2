@@ -2,15 +2,16 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Pressable, Alert, Platform, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker'; 
-import { ActivityContext } from '../Context/ActivityContext'; 
-import { ThemeContext } from '../Context/ThemeContext';
+import { ActivityContext } from '../Context/ActivityContext'; // Import ActivityContext to manage activities
+import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext for dynamic theming
 
 const AddActivity = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext);
-  const { addActivity } = useContext(ActivityContext);
+  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext); // Get theme values from ThemeContext
+  const { addActivity } = useContext(ActivityContext); // Access addActivity function from ActivityContext
   
-  const [activityType, setActivityType] = useState(null);
-  const [open, setOpen] = useState(false);
+  // Local state to manage activity input values
+  const [activityType, setActivityType] = useState(null); // Activity type selected from DropDown
+  const [open, setOpen] = useState(false); // Control the visibility of DropDownPicker
   const [items, setItems] = useState([
     { label: 'Walking', value: 'Walking' },
     { label: 'Running', value: 'Running' },
@@ -19,52 +20,58 @@ const AddActivity = ({ navigation }) => {
     { label: 'Yoga', value: 'Yoga' },
     { label: 'Cycling', value: 'Cycling' },
     { label: 'Hiking', value: 'Hiking' }
-  ]);
-  const [duration, setDuration] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  ]); // Predefined activity options
+  const [duration, setDuration] = useState(''); // Duration of the activity
+  const [date, setDate] = useState(new Date()); // Date selected for the activity
+  const [showDatePicker, setShowDatePicker] = useState(false); // Control visibility of DateTimePicker
 
+  // Handle changes when a new date is selected from DateTimePicker
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(false); // Ensure picker is hidden after selection or cancel
-    setDate(currentDate);
+    setShowDatePicker(false); // Hide DateTimePicker after a date is selected
+    setDate(currentDate); // Update date state
   };
 
+  // Function to validate user input and save the activity
   const validateAndSave = () => {
-    const durationNumber = parseInt(duration, 10);
+    const durationNumber = parseInt(duration, 10); // Parse duration input to an integer
     if (isNaN(durationNumber) || durationNumber <= 0) {
-      Alert.alert("Invalid Input", "Please enter a valid positive number for the duration.");
+      Alert.alert("Invalid Input", "Please enter a valid positive number for the duration."); // Show error for invalid duration
       return;
     }
     if (!activityType) {
-      Alert.alert("Invalid Input", "Please select an activity type.");
+      Alert.alert("Invalid Input", "Please select an activity type."); // Show error if activity type is not selected
       return;
     }
     let isSpecial = false;
     if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
-      isSpecial = true;
+      isSpecial = true; // Mark activity as special if it's Running or Weights and duration > 60
     }
+    // Add the activity using the context function
     addActivity(activityType, durationNumber, date, isSpecial);
-    Alert.alert("Success", "Activity saved successfully!", [{ text: "OK", onPress: () => navigation.goBack() }]);
+    Alert.alert("Success", "Activity saved successfully!", [{ text: "OK", onPress: () => navigation.goBack() }]); // Navigate back after success
   };
 
+  // Handle cancel action
   const handleCancel = () => {
-    navigation.goBack();
+    navigation.goBack(); // Go back to the previous screen
   };
 
+  // Set dynamic header styles based on the current theme
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
-        backgroundColor: headerColor,
+        backgroundColor: headerColor, // Header background color based on theme
       },
       headerTitleStyle: {
-        color: textColor,
+        color: textColor, // Header text color based on theme
       },
     });
-  }, [navigation, headerColor, textColor]);
+  }, [navigation, headerColor, textColor]); // Trigger when navigation or theme values change
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      {/* Activity Type Dropdown */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Activity Type *:</Text>
       <DropDownPicker
         textStyle={styles.dropdowninput}
@@ -77,32 +84,40 @@ const AddActivity = ({ navigation }) => {
         style={{ marginBottom: 10 }}
         placeholder="Select Activity Type"
       />
+
+      {/* Duration Input */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Duration (min) *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Enter duration"
-        keyboardType="numeric"
+        keyboardType="numeric" // Ensure only numbers can be entered
         value={duration}
         onChangeText={setDuration}
-        placeholderTextColor={textColor}
+        placeholderTextColor={textColor} // Placeholder text color based on theme
       />
+
+      {/* Date Picker */}
       <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Date *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Select date"
-        value={date.toLocaleDateString()} 
-        editable={false} 
-        onPressIn={() => setShowDatePicker(true)} 
+        value={date.toLocaleDateString()} // Display selected date
+        editable={false} // Prevent manual editing of the date input
+        onPressIn={() => setShowDatePicker(true)} // Show DateTimePicker on press
       />
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={onDateChange}
+          display={Platform.OS === 'ios' ? 'inline' : 'default'} // Show inline picker on iOS
+          onChange={onDateChange} // Update date on selection
         />
       )}
+
+      {/* Spacer to separate form inputs from buttons */}
       <View style={styles.flexSpacer} />
+
+      {/* Cancel and Save Buttons */}
       <View style={styles.buttonContainer}>
         <Pressable
           onPress={handleCancel}
@@ -135,6 +150,7 @@ const AddActivity = ({ navigation }) => {
   );
 };
 
+// Styles for AddActivity screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
