@@ -5,7 +5,7 @@ import { DietContext } from '../Context/DietContext';
 import { ThemeContext } from '../Context/ThemeContext';
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext); 
+  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext); 
   const { addDietEntry } = useContext(DietContext); 
 
   const [description, setDescription] = useState('');
@@ -51,17 +51,17 @@ const AddDietEntry = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.text]}>Description *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Description *:</Text>
       <TextInput
-        style={[styles.input, styles.descriptionInput]}
+        style={[styles.input, styles.descriptionInput]} 
         placeholder="Enter description"
         value={description}
         onChangeText={setDescription}
         placeholderTextColor={textColor}
-        multiline={true} // Enable multiline input
-        textAlignVertical="top" // Align text to the top
+        multiline={true} 
+        textAlignVertical="top" 
       />
-      <Text style={styles.text}>Calories *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Calories *:</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter calories"
@@ -70,13 +70,13 @@ const AddDietEntry = ({ navigation }) => {
         onChangeText={setCalories}
         placeholderTextColor={textColor}
       />
-      <Text style={[styles.text]}>Date *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Date *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Select date"
-        value={date.toLocaleDateString()} // Display the date
-        editable={false} // Prevent typing
-        onPressIn={() => setShowDatePicker(true)} // Trigger date picker when tapped
+        value={date.toLocaleDateString()} 
+        editable={false} 
+        onPressIn={() => setShowDatePicker(true)} 
       />
       {showDatePicker && (
         <DateTimePicker
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     color: '#4c0080',
     backgroundColor: 'white',
   },
-  descriptionInput: {  // Added new style for description input
+  descriptionInput: { 
     height: 130,
   },
   buttonContainer: {

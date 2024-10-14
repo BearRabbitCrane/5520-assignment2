@@ -6,7 +6,7 @@ import { ActivityContext } from '../Context/ActivityContext';
 import { ThemeContext } from '../Context/ThemeContext';
 
 const AddActivity = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor } = useContext(ThemeContext);
+  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext);
   const { addActivity } = useContext(ActivityContext);
   
   const [activityType, setActivityType] = useState(null);
@@ -65,7 +65,7 @@ const AddActivity = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.text]}>Activity Type *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Activity Type *:</Text>
       <DropDownPicker
         textStyle={styles.dropdowninput}
         open={open}
@@ -77,7 +77,7 @@ const AddActivity = ({ navigation }) => {
         style={{ marginBottom: 10 }}
         placeholder="Select Activity Type"
       />
-      <Text style={[styles.text]}>Duration (min) *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Duration (min) *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Enter duration"
@@ -86,13 +86,13 @@ const AddActivity = ({ navigation }) => {
         onChangeText={setDuration}
         placeholderTextColor={textColor}
       />
-      <Text style={[styles.text]}>Date *:</Text>
+      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Date *:</Text>
       <TextInput
         style={[styles.input]}
         placeholder="Select date"
-        value={date.toLocaleDateString()} // Display the date
-        editable={false} // Prevent typing
-        onPressIn={() => setShowDatePicker(true)} // Trigger date picker when tapped
+        value={date.toLocaleDateString()} 
+        editable={false} 
+        onPressIn={() => setShowDatePicker(true)} 
       />
       {showDatePicker && (
         <DateTimePicker
