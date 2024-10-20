@@ -1,4 +1,3 @@
-// Components/DatePicker.js
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
