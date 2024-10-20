@@ -26,13 +26,20 @@ const AddActivity = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
 
   const validateAndSave = () => {
+    // Check if any required field is empty
     if (!activityType || !duration) {
       Alert.alert('Invalid Input', 'All fields are required.');
       return;
     }
 
-    // Check if duration is a valid number and mark activity as special
+    // Check if duration is a valid number and greater than 0
     const durationNumber = parseInt(duration, 10);
+    if (isNaN(durationNumber) || durationNumber <= 0) {
+      Alert.alert('Invalid Input', 'Duration must be a positive number.');
+      return;
+    }
+
+    // Check if the activity is special (Running or Weights > 60 min)
     let isSpecial = false;
     if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
       isSpecial = true;
@@ -67,8 +74,8 @@ const AddActivity = ({ navigation }) => {
         onChangeText={setDuration}
         keyboardType="numeric"
         isDarkTheme={isDarkTheme}
-        isRequired={true}  // Mark duration field as required
-        validateNumber={true}  // Validate if the input is a number
+        isRequired={false}  // Let the validation be handled in validateAndSave
+        validateNumber={false}  // Handle number validation in validateAndSave
       />
       
       {/* Date Picker */}
@@ -77,7 +84,7 @@ const AddActivity = ({ navigation }) => {
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="secondary" />
       </View>
     </View>
   );
