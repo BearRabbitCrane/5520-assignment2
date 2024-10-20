@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { TextInput, Text, View, Alert, StyleSheet } from 'react-native';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import { TextInput, Text, View, StyleSheet } from 'react-native';
 
-const InputField = ({ 
+const InputField = forwardRef(({
   label, 
   placeholder, 
   value, 
@@ -10,21 +10,20 @@ const InputField = ({
   isDarkTheme, 
   isRequired, 
   validateNumber, 
-  showAlert = true  // New prop to control whether to show alerts or not
-}) => {
+  multiline = false,  // Default is not multiline
+  inputStyle = {},  // Customizable input style
+}, ref) => {
   const [inputError, setInputError] = useState(null);  // Manage error state
 
   // Function to validate the input field
   const validateInput = (text) => {
     if (isRequired && !text) {
       setInputError(`${label} is required.`);
-      if (showAlert) Alert.alert('Invalid Input', `${label} cannot be empty.`);
       return false;
     }
 
     if (validateNumber && isNaN(text)) {
-      setInputError(`${label} must be a number.`);
-      if (showAlert) Alert.alert('Invalid Input', `${label} must be a valid number.`);
+      setInputError(`${label} must be a valid number.`);
       return false;
     }
 
@@ -32,14 +31,19 @@ const InputField = ({
     return true;
   };
 
+  useImperativeHandle(ref, () => ({
+    validate: () => validateInput(value),
+  }));
+
   return (
     <View>
       <Text style={[styles.label, isDarkTheme && { color: '#ffffff' }]}>{label}</Text>
       <TextInput
-        style={[styles.input, isDarkTheme && { color: '#ffffff' }]}
+        style={[styles.input, isDarkTheme && { color: '#ffffff' }, inputStyle]}  // Apply custom input style
         placeholder={placeholder}
         value={value}
         keyboardType={keyboardType}
+        multiline={multiline}  // Support multiline input
         onChangeText={(text) => {
           validateInput(text);  // Validate on every text change
           onChangeText(text);  // Update parent component
@@ -50,13 +54,14 @@ const InputField = ({
       {inputError && <Text style={styles.errorText}>{inputError}</Text>} 
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: '500',
     marginBottom: 5,
+    color: '#4c0080',
   },
   input: {
     borderWidth: 2,

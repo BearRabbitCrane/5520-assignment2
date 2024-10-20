@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Text, Alert } from 'react-native';
-import PressableButton from '../Components/PressableButton';  // Reuse PressableButton
-import DatePicker from '../Components/DatePicker';  // Reuse DatePicker
-import InputField from '../Components/InputField';  // Reuse InputField
+import React, { useState, useRef, useContext } from 'react';
+import { View, StyleSheet, Alert, Text } from 'react-native';
+import PressableButton from '../Components/PressableButton';
+import DatePicker from '../Components/DatePicker';
+import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
-import { ActivityContext } from '../Context/ActivityContext';
+import { ActivityContext } from '../Context/ActivityContext'; 
 import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddActivity = ({ navigation }) => {
@@ -25,26 +25,29 @@ const AddActivity = ({ navigation }) => {
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
 
+  // Use refs to validate inputs on submit
+  const durationFieldRef = useRef();
+
   const validateAndSave = () => {
-    // Check if any required field is empty
-    if (!activityType || !duration) {
-      Alert.alert('Invalid Input', 'All fields are required.');
+    // Validate duration
+    if (!durationFieldRef.current.validate()) {
+      Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
     }
 
-    // Check if duration is a valid number and greater than 0
+    if (!activityType) {
+      Alert.alert('Invalid Input', 'Please select an activity type.');
+      return;
+    }
+
+    // Check if the duration is a valid number and mark activity as special
     const durationNumber = parseInt(duration, 10);
-    if (isNaN(durationNumber) || durationNumber <= 0) {
-      Alert.alert('Invalid Input', 'Duration must be a positive number.');
-      return;
-    }
-
-    // Check if the activity is special (Running or Weights > 60 min)
     let isSpecial = false;
     if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
       isSpecial = true;
     }
 
+    // Save activity
     addActivity(activityType, durationNumber, date, isSpecial);
     Alert.alert('Success', 'Activity saved successfully!');
     navigation.goBack();
@@ -74,8 +77,9 @@ const AddActivity = ({ navigation }) => {
         onChangeText={setDuration}
         keyboardType="numeric"
         isDarkTheme={isDarkTheme}
-        isRequired={false}  // Let the validation be handled in validateAndSave
-        validateNumber={false}  // Handle number validation in validateAndSave
+        isRequired={true}
+        validateNumber={true}
+        ref={durationFieldRef}  // Pass the ref to validate on save
       />
       
       {/* Date Picker */}
