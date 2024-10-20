@@ -1,17 +1,16 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import commonStyles from '../Helpers/styles';
 
 const PressableButton = ({ title, onPress, type = 'primary' }) => {
   const isPrimary = type === 'primary';
-  
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        pressed && styles.pressedButton,
-        !isPrimary && styles.secondaryButton,  // Apply secondary button style if not primary
+        isPrimary ? styles.primaryButton : styles.secondaryButton,
+        pressed && styles.pressedEffect,  // Apply opacity effect when pressed
       ]}
     >
       <Text style={[styles.buttonText, isPrimary ? styles.primaryText : styles.secondaryText]}>
@@ -29,25 +28,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 5,
   },
-  pressedButton: {
-    backgroundColor: '#1E90FF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  primaryButton: {
+    backgroundColor: '#4B0082',  // Dark blue for Save button
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#C2185B',  // Dark red for Cancel button
+  },
+  pressedEffect: {
+    opacity: 0.7,  // Apply semi-transparent overlay when pressed
   },
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   primaryText: {
-    color: '#fff',
+    color: '#fff',  // White text for Save button
   },
   secondaryText: {
-    color: '#1E90FF',
+    color: '#fff',  // White text for Cancel button
   },
 });
 

@@ -39,6 +39,7 @@ const AddDietEntry = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.contentContainer}>
       {/* Reusing InputField for Description with multiline and custom height */}
       <InputField
         label="Description *"
@@ -67,11 +68,12 @@ const AddDietEntry = ({ navigation }) => {
 
       {/* Date Picker */}
       <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+      </View>
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        <PressableButton title="Save" onPress={validateAndSave} type="secondary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
       </View>
     </View>
   );
@@ -79,10 +81,13 @@ const AddDietEntry = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
+  contentContainer: {
+    flex: 1,  // This will push buttons to the bottom
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 30,
   },
 });
 

@@ -35,13 +35,18 @@ const AddActivity = ({ navigation }) => {
       return;
     }
 
+    const durationNumber = parseInt(duration, 10);
+    if (durationNumber <= 0) {
+      Alert.alert('Invalid Input', 'Duration must be a positive number.');
+      return;
+    }
+
     if (!activityType) {
       Alert.alert('Invalid Input', 'Please select an activity type.');
       return;
     }
 
     // Check if the duration is a valid number and mark activity as special
-    const durationNumber = parseInt(duration, 10);
     let isSpecial = false;
     if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
       isSpecial = true;
@@ -55,6 +60,7 @@ const AddActivity = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.contentContainer}>
       {/* Dropdown Picker */}
       <Text style={styles.label}>Activity Type *:</Text>
       <DropDownPicker
@@ -84,18 +90,25 @@ const AddActivity = ({ navigation }) => {
       
       {/* Date Picker */}
       <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+      </View>
       
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        <PressableButton title="Save" onPress={validateAndSave} type="secondary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { 
+    flex: 1, 
+    padding: 20,
+  },
+  contentContainer: {
+    flex: 1,  // This will push buttons to the bottom
+  },
   label: {
     fontSize: 18,
     marginBottom: 10,
@@ -105,7 +118,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginBottom: 40,  // Add margin to move buttons up a bit from the bottom
   },
   dropdowninput: {
     fontSize: 18,
