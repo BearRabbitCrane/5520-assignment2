@@ -38,7 +38,7 @@ const Activities = ({ navigation }) => {
             style={({ pressed }) => [
               {
                 backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
-                paddingHorizontal: 10,
+                paddingHorizontal: 0,
                 paddingVertical: 5,
                 borderRadius: 5,
               },

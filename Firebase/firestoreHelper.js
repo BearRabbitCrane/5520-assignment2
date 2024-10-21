@@ -38,20 +38,18 @@ export async function deleteActivityFromDB(activityId) {
 }
 
 // Function to listen to real-time updates in Firestore
-export async function listenToActivities(callback) {
-  try {
-    const unsubscribe = onSnapshot(collection(database, 'activities'), (snapshot) => {
-      const activities = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      callback(activities); // Pass the activities data to the callback function
-    });
-    return unsubscribe; // Return the unsubscribe function to stop listening when no longer needed
-  } catch (error) {
-    console.error('Error listening to activities: ', error);
-    throw error;
-  }
+export function listenToActivities(callback) {
+  const activitiesCollection = collection(database, 'activities');
+  
+  const unsubscribe = onSnapshot(activitiesCollection, (snapshot) => {
+    const activities = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    callback(activities); // Pass the activities data to the callback function
+  });
+
+  return unsubscribe; // This should return the unsubscribe function
 }
 
 // Function to fetch all documents in the 'dietEntries' collection
@@ -83,7 +81,7 @@ export async function addDietEntryToDB(dietData) {
 // Function to delete a diet entry
 export async function deleteDietEntryFromDB(entryId) {
   try {
-    await deleteDoc(doc(database, 'dietEntries', entryId));
+    await deleteDoc(doc(database, 'diet', entryId));
   } catch (error) {
     console.error('Error deleting diet entry: ', error);
     throw error;
@@ -91,18 +89,15 @@ export async function deleteDietEntryFromDB(entryId) {
 }
 
 // Function to listen to real-time updates in Firestore for diet entries
-export async function listenToDietEntries(callback) {
-  try {
-    const unsubscribe = onSnapshot(collection(database, 'dietEntries'), (snapshot) => {
-      const dietEntries = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      callback(dietEntries); // Pass the diet entries data to the callback function
-    });
-    return unsubscribe; // Return the unsubscribe function to stop listening when no longer needed
-  } catch (error) {
-    console.error('Error listening to diet entries: ', error);
-    throw error;
-  }
+export function listenToDietEntries(callback) {
+  const collectionRef = collection(database, 'diet');
+  
+  // Set up real-time listener with onSnapshot
+  return onSnapshot(collectionRef, (snapshot) => {
+    const dietEntries = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    callback(dietEntries); // Pass the diet entries data to the callback function
+  });
 }

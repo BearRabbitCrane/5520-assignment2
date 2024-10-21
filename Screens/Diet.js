@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // For icons
 import { ThemeContext } from '../Context/ThemeContext';
 import ItemsList from '../Components/ItemsList'; // Import ItemsList
 import commonStyles from '../Helpers/styles'; // Import common styles
@@ -31,19 +32,34 @@ const Diet = ({ navigation }) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
+        <View style={styles.headerIconsContainer}>
         <Pressable
           onPress={() => navigation.navigate('AddDietEntry')}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
-              paddingHorizontal: 10,
+              paddingHorizontal: 0,
               paddingVertical: 5,
               borderRadius: 5,
             },
           ]}
         >
-          <Text style={styles.addButton}>Add</Text>
+          <Ionicons name="add" size={24} color={commonStyles.whiteColor} />
         </Pressable>
+        <Pressable
+            onPress={() => navigation.navigate('DietProfile')}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 5,
+              },
+            ]}
+          >
+            <Ionicons name="fast-food" size={24} color={commonStyles.whiteColor} />
+          </Pressable>
+        </View>
       ),
       headerStyle: {
         backgroundColor: headerColor,
@@ -72,9 +88,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  addButton: {
-    fontSize: 16,
-    color: commonStyles.whiteColor,
+  headerIconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
