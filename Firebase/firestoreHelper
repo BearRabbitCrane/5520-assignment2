@@ -1,0 +1,53 @@
+import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc } from "firebase/firestore";
+import { database } from "./firebase"; // Import the Firestore database object from firebase.js
+
+export async function writeToDB(data, collectionName) {
+  try {
+    const docRef = await addDoc(collection(database, collectionName), data);
+    console.log('Document written with ID: ', docRef.id);
+    return docRef.id; // Return the document ID if needed
+  } catch (err) {
+    console.error('Error adding document: ', err);
+    throw err;
+  }
+}
+
+export async function deleteFromDB(id, collectionName) {
+  try {
+    const docRef = doc(database, collectionName, id);
+    await deleteDoc(docRef);
+    console.log('Document deleted with ID: ', id);
+  } catch (err) {
+    console.error('Error deleting document: ', err);
+    throw err;
+  }
+}
+
+export async function deleteAllFromDB(collectionName) {
+  try {
+    const querySnapshot = await getDocs(collection(database, collectionName));
+    const deletePromises = [];
+
+    querySnapshot.forEach((docSnapshot) => {
+      const docRef = doc(database, collectionName, docSnapshot.id);
+      deletePromises.push(deleteDoc(docRef));
+    });
+
+    await Promise.all(deletePromises);
+    console.log(`All documents deleted from the ${collectionName} collection.`);
+  } catch (err) {
+    console.error('Error deleting all documents: ', err);
+    throw err;
+  }
+}
+
+export async function updateWarningInDB(id, collectionName) {
+  try {
+    const docRef = doc(database, collectionName, id);
+    await updateDoc(docRef, { warning: true });
+    console.log(`Warning field updated for document ID: ${id}`);
+  } catch (err) {
+    console.error('Error updating warning field: ', err);
+    throw err;
+  }
+}

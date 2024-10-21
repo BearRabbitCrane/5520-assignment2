@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 
 // Your Firebase configuration here
 const firebaseConfig = {
@@ -12,10 +13,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+const app = initializeApp(firebaseConfig);
 
 // Export Firestore database
-const db = firebase.firestore();
-export { db };
+export const database = getFirestore(app);
