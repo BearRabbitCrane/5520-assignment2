@@ -53,3 +53,56 @@ export async function listenToActivities(callback) {
     throw error;
   }
 }
+
+// Function to fetch all documents in the 'dietEntries' collection
+export async function fetchDietEntries() {
+  try {
+    const querySnapshot = await getDocs(collection(database, 'dietEntries'));
+    const dietEntries = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return dietEntries;
+  } catch (error) {
+    console.error('Error fetching diet entries: ', error);
+    throw error;
+  }
+}
+
+// Function to add a new diet entry
+export async function addDietEntryToDB(dietData) {
+  try {
+    const docRef = await addDoc(collection(database, 'dietEntries'), dietData);
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding diet entry: ', error);
+    throw error;
+  }
+}
+
+// Function to delete a diet entry
+export async function deleteDietEntryFromDB(entryId) {
+  try {
+    await deleteDoc(doc(database, 'dietEntries', entryId));
+  } catch (error) {
+    console.error('Error deleting diet entry: ', error);
+    throw error;
+  }
+}
+
+// Function to listen to real-time updates in Firestore for diet entries
+export async function listenToDietEntries(callback) {
+  try {
+    const unsubscribe = onSnapshot(collection(database, 'dietEntries'), (snapshot) => {
+      const dietEntries = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(dietEntries); // Pass the diet entries data to the callback function
+    });
+    return unsubscribe; // Return the unsubscribe function to stop listening when no longer needed
+  } catch (error) {
+    console.error('Error listening to diet entries: ', error);
+    throw error;
+  }
+}
