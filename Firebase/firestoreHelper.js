@@ -20,9 +20,9 @@ export async function fetchActivities() {
 export async function addActivityToDB(activityData) {
   try {
     const docRef = await addDoc(collection(database, 'activities'), activityData);
-    return docRef.id;
+    return docRef.id; // Return the generated document ID
   } catch (error) {
-    console.error('Error adding activity: ', error);
+    console.error('Error adding activity:', error);
     throw error;
   }
 }
@@ -39,17 +39,30 @@ export async function deleteActivityFromDB(activityId) {
 
 // Function to listen to real-time updates in Firestore
 export function listenToActivities(callback) {
-  const activitiesCollection = collection(database, 'activities');
-  
-  const unsubscribe = onSnapshot(activitiesCollection, (snapshot) => {
-    const activities = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    callback(activities); // Pass the activities data to the callback function
-  });
+  try {
+    const activitiesCollectionRef = collection(database, 'activities'); // Reference to activities collection
+    const unsubscribe = onSnapshot(activitiesCollectionRef, (snapshot) => {
+      const activities = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(activities); // Pass the activities data to the callback function
+    });
+    return unsubscribe; // Return the unsubscribe function
+  } catch (error) {
+    console.error('Error listening to activities: ', error);
+    throw error;
+  }
+}
 
-  return unsubscribe; // This should return the unsubscribe function
+export async function updateActivityInDB(activityId, updatedData) {
+  try {
+    const activityRef = doc(database, 'activities', activityId);
+    await updateDoc(activityRef, updatedData);
+  } catch (error) {
+    console.error('Error updating activity:', error);
+    throw error;
+  }
 }
 
 // Function to fetch all documents in the 'dietEntries' collection

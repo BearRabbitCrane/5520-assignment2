@@ -4,13 +4,12 @@ import PressableButton from '../Components/PressableButton';
 import DatePicker from '../Components/DatePicker';
 import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
-import { ActivityContext } from '../Context/ActivityContext'; 
+import { addActivityToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
 import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddActivity = ({ navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
-  const { addActivity } = useContext(ActivityContext);
-
+  
   const [activityType, setActivityType] = useState(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -24,12 +23,9 @@ const AddActivity = ({ navigation }) => {
   ]);
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(new Date());
-
-  // Use refs to validate inputs on submit
   const durationFieldRef = useRef();
 
-  const validateAndSave = () => {
-    // Validate duration
+  const validateAndSave = async () => {
     if (!durationFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
@@ -46,65 +42,69 @@ const AddActivity = ({ navigation }) => {
       return;
     }
 
-    // Check if the duration is a valid number and mark activity as special
     let isSpecial = false;
     if ((activityType === 'Running' || activityType === 'Weights') && durationNumber > 60) {
       isSpecial = true;
     }
 
-    // Save activity
-    addActivity(activityType, durationNumber, date, isSpecial);
-    Alert.alert('Success', 'Activity saved successfully!');
-    navigation.goBack();
+    try {
+      const activityData = {
+        activityType,
+        duration: durationNumber,
+        date: date.toISOString(),
+        isSpecial
+      };
+
+      const docId = await addActivityToDB(activityData); // Add the activity to Firestore and get the generated ID
+      console.log('New activity added with ID:', docId);
+
+      Alert.alert('Success', 'Activity saved successfully!');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Failed to save activity:', error);
+      Alert.alert('Error', 'Failed to save the activity. Please try again.');
+    }
   };
 
-  // Set the same header colors as the Activities screen
+  // Set header styles
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: headerColor, // Apply the same background color as Activities
-      },
-      headerTitleStyle: {
-        color: textColor, // Apply the same text color as Activities
-      },
+      headerStyle: { backgroundColor: headerColor },
+      headerTitleStyle: { color: textColor }
     });
   }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.contentContainer}>
-      {/* Dropdown Picker */}
-      <Text style={styles.label}>Activity Type *:</Text>
-      <DropDownPicker
-        textStyle={styles.dropdowninput}
-        open={open}
-        value={activityType}
-        items={items}
-        setOpen={setOpen}
-        setValue={setActivityType}
-        setItems={setItems}
-        placeholder="Select Activity Type"
-        style={{ marginBottom: 10 }}
-      />
-      
-      {/* Duration Input */}
-      <InputField
-        label="Duration (min)"
-        placeholder="Enter duration"
-        value={duration}
-        onChangeText={setDuration}
-        keyboardType="numeric"
-        isDarkTheme={isDarkTheme}
-        isRequired={true}
-        validateNumber={true}
-        ref={durationFieldRef}  // Pass the ref to validate on save
-      />
-      
-      {/* Date Picker */}
-      <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+        <Text style={styles.label}>Activity Type *:</Text>
+        <DropDownPicker
+          textStyle={styles.dropdowninput}
+          open={open}
+          value={activityType}
+          items={items}
+          setOpen={setOpen}
+          setValue={setActivityType}
+          setItems={setItems}
+          placeholder="Select Activity Type"
+          style={{ marginBottom: 10 }}
+        />
+
+        <InputField
+          label="Duration (min)"
+          placeholder="Enter duration"
+          value={duration}
+          onChangeText={setDuration}
+          keyboardType="numeric"
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          validateNumber={true}
+          ref={durationFieldRef}
+        />
+
+        <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
       </View>
-      
-      {/* Buttons */}
+
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
         <PressableButton title="Save" onPress={validateAndSave} type="primary" />
@@ -114,29 +114,11 @@ const AddActivity = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20,
-  },
-  contentContainer: {
-    flex: 1,  // This will push buttons to the bottom
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 10,
-    fontWeight: '500',
-    color: '#4c0080',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 40,  // Add margin to move buttons up a bit from the bottom
-  },
-  dropdowninput: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#4c0080'
-  },
+  container: { flex: 1, padding: 20 },
+  contentContainer: { flex: 1 },
+  label: { fontSize: 18, marginBottom: 10, fontWeight: '500', color: '#4c0080' },
+  buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 40 },
+  dropdowninput: { fontSize: 18, fontWeight: '400', color: '#4c0080' },
 });
 
 export default AddActivity;
