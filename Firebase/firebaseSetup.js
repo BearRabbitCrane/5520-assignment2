@@ -1,6 +1,5 @@
-import firebase from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import firestore from '@react-native-firebase/firestore';
 
 // Your Firebase configuration here
 const firebaseConfig = {
