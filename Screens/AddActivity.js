@@ -8,7 +8,7 @@ import { ActivityContext } from '../Context/ActivityContext';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddActivity = ({ navigation }) => {
-  const { backgroundColor, isDarkTheme } = useContext(ThemeContext);
+  const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
   const { addActivity } = useContext(ActivityContext);
 
   const [activityType, setActivityType] = useState(null);
@@ -57,6 +57,18 @@ const AddActivity = ({ navigation }) => {
     Alert.alert('Success', 'Activity saved successfully!');
     navigation.goBack();
   };
+
+  // Set the same header colors as the Activities screen
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Apply the same background color as Activities
+      },
+      headerTitleStyle: {
+        color: textColor, // Apply the same text color as Activities
+      },
+    });
+  }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>

@@ -7,7 +7,7 @@ import { ThemeContext } from '../Context/ThemeContext';
 import { DietContext } from '../Context/DietContext'; 
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, isDarkTheme } = useContext(ThemeContext);
+  const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
   const { addDietEntry } = useContext(DietContext);
 
   const [description, setDescription] = useState(''); 
@@ -36,6 +36,18 @@ const AddDietEntry = ({ navigation }) => {
     addDietEntry(description, caloriesNumber, date, isSpecial);
     Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
   };
+
+  // Set the same header colors as the Activities screen
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: headerColor, // Apply the same background color as Activities
+      },
+      headerTitleStyle: {
+        color: textColor, // Apply the same text color as Activities
+      },
+    });
+  }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
