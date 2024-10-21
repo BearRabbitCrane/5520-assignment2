@@ -1,34 +1,36 @@
 import React from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
+import { FlatList, View, Text, StyleSheet, Pressable } from 'react-native';
 import commonStyles from '../Helpers/styles';  // Assuming you have common styles
 
-const ItemsList = ({ entries, type }) => {
+const ItemsList = ({ entries, type, onEdit }) => {
   const renderItem = ({ item }) => (
-    <View style={styles.entryCard}>
-      <View style={styles.entryNameContainer}>
-        <Text style={styles.entryName}>
-          {type === 'activity' ? item.activityType : item.description}
-        </Text>
-        {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
-      </View>
-      <View style={styles.entryInfo}>
-        <View style={[styles.infoBox, { width: 145 }]}>
-          <Text style={styles.infoText}>
-            {new Date(item.date).toLocaleDateString('en-US', {
-              weekday: 'short',
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
+    <Pressable onPress={() => onEdit(item)} style={styles.pressableItem}>
+      <View style={styles.entryCard}>
+        <View style={styles.entryNameContainer}>
+          <Text style={styles.entryName}>
+            {type === 'activity' ? item.activityType : item.description}
           </Text>
+          {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
         </View>
-        <View style={[styles.infoBox, { width: 75 }]}>
-          <Text style={styles.infoText}>
-            {type === 'activity' ? `${item.duration} min` : `${item.calories} kcal`}
-          </Text>
+        <View style={styles.entryInfo}>
+          <View style={[styles.infoBox, { width: 145 }]}>
+            <Text style={styles.infoText}>
+              {new Date(item.date).toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+          <View style={[styles.infoBox, { width: 75 }]}>
+            <Text style={styles.infoText}>
+              {type === 'activity' ? `${item.duration} min` : `${item.calories} kcal`}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -42,6 +44,9 @@ const ItemsList = ({ entries, type }) => {
 
 const styles = StyleSheet.create({
   ...commonStyles,
+  pressableItem: {
+    marginBottom: 10,
+  },
   entryCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -49,7 +54,6 @@ const styles = StyleSheet.create({
     backgroundColor: commonStyles.primaryColor,
     borderRadius: 8,
     padding: 15,
-    marginBottom: 15,
   },
   entryNameContainer: {
     flexDirection: 'row',
