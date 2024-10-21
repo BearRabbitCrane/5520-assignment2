@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons'; // For icons
 import ItemsList from '../Components/ItemsList';
 import commonStyles from '../Helpers/styles';
 import { ThemeContext } from '../Context/ThemeContext';
-import { listenToActivities, deleteActivityFromDB } from '../Firebase/firestoreHelper.js'; // Import Firestore helpers
+import { listenToActivities, deleteActivityFromDB } from '../Firebase/firestoreHelper'; // Import Firestore helpers
 
 const Activities = ({ navigation }) => {
   const { backgroundColor, textColor, headerColor } = useContext(ThemeContext);
@@ -18,6 +18,11 @@ const Activities = ({ navigation }) => {
 
     return () => unsubscribe(); // Clean up listener when component unmounts
   }, []);
+
+  // Navigate to EditActivity screen
+  const handleEditActivity = (activity) => {
+    navigation.navigate('EditActivity', { activity }); // Pass activity data to EditActivity
+  };
 
   // Delete an activity
   const handleDeleteActivity = async (activityId) => {
@@ -38,7 +43,7 @@ const Activities = ({ navigation }) => {
             style={({ pressed }) => [
               {
                 backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
-                paddingHorizontal: 0,
+                paddingHorizontal: 10,
                 paddingVertical: 5,
                 borderRadius: 5,
               },
@@ -75,6 +80,7 @@ const Activities = ({ navigation }) => {
       <ItemsList 
         entries={activities} 
         type="activity" 
+        onEdit={handleEditActivity}  // Pass edit function to ItemsList
         onDelete={handleDeleteActivity} // Pass delete function to ItemsList
       />
     </View>
