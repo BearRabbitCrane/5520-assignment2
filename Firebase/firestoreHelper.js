@@ -103,7 +103,7 @@ export async function deleteDietEntryFromDB(entryId) {
 
 // Function to listen to real-time updates in Firestore for diet entries
 export function listenToDietEntries(callback) {
-  const collectionRef = collection(database, 'diet');
+  const collectionRef = collection(database, 'dietEntries');
   
   // Set up real-time listener with onSnapshot
   return onSnapshot(collectionRef, (snapshot) => {
@@ -111,6 +111,7 @@ export function listenToDietEntries(callback) {
       id: doc.id,
       ...doc.data(),
     }));
+    console.log('Fetched diet entries:', dietEntries);  // Log fetched data
     callback(dietEntries); // Pass the diet entries data to the callback function
   });
 }

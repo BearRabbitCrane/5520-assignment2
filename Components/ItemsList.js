@@ -3,6 +3,7 @@ import { FlatList, View, Text, StyleSheet, Pressable } from 'react-native';
 import commonStyles from '../Helpers/styles';  // Assuming you have common styles
 
 const ItemsList = ({ entries, type, onEdit }) => {
+  console.log('Rendering ItemsList with entries:', entries);  // Log the entries passed to ItemsList
   const renderItem = ({ item }) => (
     <Pressable onPress={() => onEdit(item)} style={styles.pressableItem}>
       <View style={styles.entryCard}>
@@ -36,7 +37,7 @@ const ItemsList = ({ entries, type, onEdit }) => {
   return (
     <FlatList
       data={entries}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}  // Make sure each entry has a unique ID
       renderItem={renderItem}
     />
   );

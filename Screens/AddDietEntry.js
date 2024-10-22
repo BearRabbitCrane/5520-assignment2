@@ -1,24 +1,21 @@
 import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import PressableButton from '../Components/PressableButton';  // Reuse PressableButton
-import DatePicker from '../Components/DatePicker';  // Reuse DatePicker
-import InputField from '../Components/InputField';  // Reuse InputField
+import PressableButton from '../Components/PressableButton';  
+import DatePicker from '../Components/DatePicker';  
+import InputField from '../Components/InputField';  
 import { ThemeContext } from '../Context/ThemeContext';
-import { DietContext } from '../Context/DietContext'; 
+import { addDietEntryToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
 
 const AddDietEntry = ({ navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
-  const { addDietEntry } = useContext(DietContext);
-
+  
   const [description, setDescription] = useState(''); 
   const [calories, setCalories] = useState('');
   const [date, setDate] = useState(new Date());
-
-  // Use refs to validate inputs on submit
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
 
-  const validateAndSave = () => {
+  const validateAndSave = async () => {
     if (!descriptionFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid description.');
       return;
@@ -29,60 +26,64 @@ const AddDietEntry = ({ navigation }) => {
       return;
     }
 
-    // Parse calories and mark as special if calories are over 800
     const caloriesNumber = parseInt(calories, 10);
     const isSpecial = caloriesNumber > 800;
 
-    addDietEntry(description, caloriesNumber, date, isSpecial);
-    Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+    const dietData = {
+      description,
+      calories: caloriesNumber,
+      date: date.toISOString(),
+      isSpecial
+    };
+
+    try {
+      const docId = await addDietEntryToDB(dietData); // Add diet entry to Firestore and get the generated ID
+      console.log('New diet entry added with ID:', docId);
+
+      Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+    } catch (error) {
+      console.error('Failed to save diet entry:', error);
+      Alert.alert('Error', 'Failed to save the diet entry. Please try again.');
+    }
   };
 
-  // Set the same header colors as the Activities screen
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: headerColor, // Apply the same background color as Activities
-      },
-      headerTitleStyle: {
-        color: textColor, // Apply the same text color as Activities
-      },
+      headerStyle: { backgroundColor: headerColor },
+      headerTitleStyle: { color: textColor }
     });
   }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.contentContainer}>
-      {/* Reusing InputField for Description with multiline and custom height */}
-      <InputField
-        label="Description *"
-        placeholder="Enter description"
-        value={description}
-        onChangeText={setDescription}
-        isDarkTheme={isDarkTheme}
-        isRequired={true}  // Mark as required
-        multiline={true}  // Enable multiline for description
-        inputStyle={{ height: 120 }}  // Custom height, roughly 3x other fields
-        ref={descriptionFieldRef}  // Pass ref for validation on Save
-      />
+        <InputField
+          label="Description *"
+          placeholder="Enter description"
+          value={description}
+          onChangeText={setDescription}
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          multiline={true}
+          inputStyle={{ height: 120 }}
+          ref={descriptionFieldRef}
+        />
 
-      {/* Reusing InputField for Calories */}
-      <InputField
-        label="Calories *"
-        placeholder="Enter calories"
-        value={calories}
-        onChangeText={setCalories}
-        keyboardType="numeric"
-        isDarkTheme={isDarkTheme}
-        isRequired={true}  // Mark as required
-        validateNumber={true}  // Validate that the input is a number
-        ref={caloriesFieldRef}  // Pass ref for validation on Save
-      />
+        <InputField
+          label="Calories *"
+          placeholder="Enter calories"
+          value={calories}
+          onChangeText={setCalories}
+          keyboardType="numeric"
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          validateNumber={true}
+          ref={caloriesFieldRef}
+        />
 
-      {/* Date Picker */}
-      <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+        <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
         <PressableButton title="Save" onPress={validateAndSave} type="primary" />
@@ -93,14 +94,8 @@ const AddDietEntry = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
-  contentContainer: {
-    flex: 1,  // This will push buttons to the bottom
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
+  contentContainer: { flex: 1 },
+  buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 },
 });
 
 export default AddDietEntry;
