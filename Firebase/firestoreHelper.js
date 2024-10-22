@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { database } from './firebaseSetup'; // Import Firestore database setup
 
 // Function to fetch all documents in the 'activities' collection

@@ -6,14 +6,6 @@ import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
 import { updateDietEntryInDB } from '../Firebase/firestoreHelper'; // Firestore helper function
 
-// Helper function to format date as YYYY-MM-DD
-const formatDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 const EditDietEntry = ({ route, navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
   const { dietEntry } = route.params; // Receive diet entry details from route params
@@ -28,7 +20,27 @@ const EditDietEntry = ({ route, navigation }) => {
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
 
-  const validateAndSave = async () => {
+  // Confirmation alert before saving
+  const confirmSave = () => {
+    Alert.alert(
+      "Important",
+      "Are you sure you want to save these changes?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Save cancelled"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: handleSave, // Call the save function when user confirms
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleSave = async () => {
     if (!descriptionFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid description.');
       return;
@@ -42,13 +54,10 @@ const EditDietEntry = ({ route, navigation }) => {
     const caloriesNumber = parseInt(calories, 10);
     const isSpecial = caloriesNumber > 800;
 
-    // Format the selected date to store only YYYY-MM-DD
-    const formattedDate = formatDate(date);
-
     const updatedDietData = {
       description,
       calories: caloriesNumber,
-      date: formattedDate, // Store only the date (YYYY-MM-DD)
+      date: date,
       isSpecial
     };
 
@@ -103,7 +112,8 @@ const EditDietEntry = ({ route, navigation }) => {
 
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
+        {/* Use confirmSave to show the alert before saving */}
+        <PressableButton title="Save" onPress={confirmSave} type="primary" />
       </View>
     </View>
   );

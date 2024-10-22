@@ -28,7 +28,26 @@ const EditActivity = ({ route, navigation }) => {
   const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
   const durationFieldRef = useRef();
 
-  const validateAndSave = async () => {
+  const confirmSave = () => {
+    Alert.alert(
+      "Important",
+      "Are you sure you want to save these changes?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Save cancelled"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: handleSave, // Call the save function when user confirms
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleSave = async () => {
     if (!durationFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
@@ -104,7 +123,8 @@ const EditActivity = ({ route, navigation }) => {
 
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
+        {/* Use the confirmSave function to show the alert when saving */}
+        <PressableButton title="Save" onPress={confirmSave} type="primary" />
       </View>
     </View>
   );
