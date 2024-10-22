@@ -114,11 +114,29 @@ const AddActivity = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  contentContainer: { flex: 1 },
-  label: { fontSize: 18, marginBottom: 10, fontWeight: '500', color: '#4c0080' },
-  buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 40 },
-  dropdowninput: { fontSize: 18, fontWeight: '400', color: '#4c0080' },
+  container: { 
+    flex: 1, 
+    padding: 20 
+  },
+  contentContainer: { 
+    flex: 1 
+  },
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
+  },
+  buttonContainer: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 40 
+  },
+  dropdowninput: { 
+    fontSize: 18, 
+    fontWeight: '400', 
+    color: '#4c0080' }
+    ,
 });
 
 export default AddActivity;

@@ -1,80 +1,136 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Pressable, Alert } from 'react-native';
-import { updateActivityInDB } from '../Firebase/firestoreHelper';
-import commonStyles from '../Helpers/styles';
+import React, { useState, useRef, useContext } from 'react';
+import { View, StyleSheet, Alert, Text } from 'react-native';
+import PressableButton from '../Components/PressableButton';
+import DatePicker from '../Components/DatePicker';
+import InputField from '../Components/InputField';
+import { ThemeContext } from '../Context/ThemeContext';
+import { updateActivityInDB } from '../Firebase/firestoreHelper'; // Firestore helper function
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const EditActivity = ({ route, navigation }) => {
-  const { activity } = route.params;
+  const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
+  const { activity } = route.params; // Receive activity details from route params
+  
   const [activityType, setActivityType] = useState(activity.activityType);
-  const [duration, setDuration] = useState(activity.duration);
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    { label: 'Walking', value: 'Walking' },
+    { label: 'Running', value: 'Running' },
+    { label: 'Swimming', value: 'Swimming' },
+    { label: 'Weights', value: 'Weights' },
+    { label: 'Yoga', value: 'Yoga' },
+    { label: 'Cycling', value: 'Cycling' },
+    { label: 'Hiking', value: 'Hiking' }
+  ]);
+  const [duration, setDuration] = useState(activity.duration.toString());
+  const [date, setDate] = useState(new Date(activity.date));
+  const durationFieldRef = useRef();
 
-  const handleUpdate = async () => {
-    if (!activityType || duration <= 0) {
-      Alert.alert('Invalid input', 'Please provide valid activity details.');
+  const validateAndSave = async () => {
+    if (!durationFieldRef.current.validate()) {
+      Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
     }
 
+    const durationNumber = parseInt(duration, 10);
+    if (durationNumber <= 0) {
+      Alert.alert('Invalid Input', 'Duration must be a positive number.');
+      return;
+    }
+
+    if (!activityType) {
+      Alert.alert('Invalid Input', 'Please select an activity type.');
+      return;
+    }
+
+    const updatedActivity = {
+      activityType,
+      duration: durationNumber,
+      date: date.toISOString(),
+    };
+
     try {
-      await updateActivityInDB(activity.id, { activityType, duration });
-      Alert.alert('Success', 'Activity updated successfully.');
+      await updateActivityInDB(activity.id, updatedActivity); // Update activity in Firestore
+      Alert.alert('Success', 'Activity updated successfully!');
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to update activity.');
+      console.error('Failed to update activity:', error);
+      Alert.alert('Error', 'Failed to update the activity. Please try again.');
     }
   };
 
+  // Set header styles
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: headerColor },
+      headerTitleStyle: { color: textColor },
+      title: 'Edit Activity',
+    });
+  }, [navigation, headerColor, textColor]);
+
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        value={activityType}
-        onChangeText={setActivityType}
-        placeholder="Activity Type"
-      />
-      <TextInput
-        style={styles.input}
-        value={duration.toString()}
-        onChangeText={(val) => setDuration(parseInt(val))}
-        placeholder="Duration (min)"
-        keyboardType="numeric"
-      />
-      {/* Replacing Button with Pressable */}
-      <Pressable
-        onPress={handleUpdate}
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed ? commonStyles.secondaryColor : commonStyles.primaryColor,
-            padding: 10,
-            borderRadius: 5,
-            alignItems: 'center',
-            marginTop: 20,
-          },
-        ]}
-      >
-        <Text style={styles.buttonText}>Save</Text>
-      </Pressable>
+    <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.contentContainer}>
+        <Text style={styles.label}>Activity Type *:</Text>
+        <DropDownPicker
+          textStyle={styles.dropdowninput}
+          open={open}
+          value={activityType}
+          items={items}
+          setOpen={setOpen}
+          setValue={setActivityType}
+          setItems={setItems}
+          placeholder="Select Activity Type"
+          style={{ marginBottom: 10 }}
+        />
+
+        <InputField
+          label="Duration (min)"
+          placeholder="Enter duration"
+          value={duration}
+          onChangeText={setDuration}
+          keyboardType="numeric"
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          validateNumber={true}
+          ref={durationFieldRef}
+        />
+
+        <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  input: {
-    marginBottom: 20,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: commonStyles.primaryColor,
-    borderRadius: 5,
-    fontSize: 18,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  container: { 
+    flex: 1, 
+    padding: 20 
+},
+  contentContainer: { 
+    flex: 1 
+},
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
+},
+  buttonContainer: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 40 
+},
+  dropdowninput: { 
+    fontSize: 18, 
+    fontWeight: '400', 
+    color: '#4c0080' }
+    ,
 });
 
 export default EditActivity;
