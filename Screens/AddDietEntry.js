@@ -6,6 +6,14 @@ import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
 import { addDietEntryToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
 
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const AddDietEntry = ({ navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
   
@@ -29,14 +37,17 @@ const AddDietEntry = ({ navigation }) => {
     const caloriesNumber = parseInt(calories, 10);
     const isSpecial = caloriesNumber > 800;
 
-    const dietData = {
-      description,
-      calories: caloriesNumber,
-      date: date.toISOString(),
-      isSpecial
-    };
-
     try {
+      // Format date without time
+      const formattedDate = formatDate(date);
+
+      const dietData = {
+        description,
+        calories: caloriesNumber,
+        date: formattedDate, // Only save the formatted date (YYYY-MM-DD)
+        isSpecial
+      };
+
       const docId = await addDietEntryToDB(dietData); // Add diet entry to Firestore and get the generated ID
       console.log('New diet entry added with ID:', docId);
 

@@ -7,6 +7,14 @@ import { ThemeContext } from '../Context/ThemeContext';
 import { addActivityToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
 import DropDownPicker from 'react-native-dropdown-picker';
 
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const AddActivity = ({ navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
   
@@ -48,10 +56,13 @@ const AddActivity = ({ navigation }) => {
     }
 
     try {
+      // Format date without time
+      const formattedDate = formatDate(date);
+
       const activityData = {
         activityType,
         duration: durationNumber,
-        date: date.toISOString(),
+        date: formattedDate, // Only save the formatted date (YYYY-MM-DD)
         isSpecial
       };
 
