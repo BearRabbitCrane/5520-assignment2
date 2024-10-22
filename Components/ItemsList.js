@@ -2,6 +2,20 @@ import React from 'react';
 import { FlatList, View, Text, StyleSheet, Pressable } from 'react-native';
 import commonStyles from '../Helpers/styles';  // Assuming you have common styles
 
+// Helper function to format the date with day and avoid timezone issues
+const formatDateWithoutTimezoneIssue = (date) => {
+  const parsedDate = new Date(date);
+  
+  // This ensures the correct formatting (e.g., Fri, Oct 11, 2024)
+  return parsedDate.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC', // Ensure it interprets the date as UTC
+  });
+};
+
 const ItemsList = ({ entries, type, onEdit }) => {
   console.log('Rendering ItemsList with entries:', entries);  // Log the entries passed to ItemsList
   const renderItem = ({ item }) => (
@@ -16,12 +30,7 @@ const ItemsList = ({ entries, type, onEdit }) => {
         <View style={styles.entryInfo}>
           <View style={[styles.infoBox, { width: 145 }]}>
             <Text style={styles.infoText}>
-              {new Date(item.date).toLocaleDateString('en-US', {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {formatDateWithoutTimezoneIssue(item.date)} {/* Correctly format the date */}
             </Text>
           </View>
           <View style={[styles.infoBox, { width: 75 }]}>

@@ -23,7 +23,9 @@ const EditActivity = ({ route, navigation }) => {
     { label: 'Hiking', value: 'Hiking' }
   ]);
   const [duration, setDuration] = useState(activity.duration.toString());
-  const [date, setDate] = useState(new Date(activity.date));
+  
+  // Pre-populate the date with the activity's date
+  const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
   const durationFieldRef = useRef();
 
   const validateAndSave = async () => {
@@ -46,7 +48,7 @@ const EditActivity = ({ route, navigation }) => {
     const updatedActivity = {
       activityType,
       duration: durationNumber,
-      date: date.toISOString(),
+      date: date.toISOString(), // Convert date to ISO string for storage
     };
 
     try {
@@ -96,6 +98,7 @@ const EditActivity = ({ route, navigation }) => {
           ref={durationFieldRef}
         />
 
+        {/* Pre-populate date with the date from activity */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
       </View>
 
@@ -111,26 +114,26 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     padding: 20 
-},
+  },
   contentContainer: { 
     flex: 1 
-},
+  },
   label: { 
     fontSize: 18, 
     marginBottom: 10, 
     fontWeight: '500', 
     color: '#4c0080' 
-},
+  },
   buttonContainer: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     marginBottom: 40 
-},
+  },
   dropdowninput: { 
     fontSize: 18, 
     fontWeight: '400', 
-    color: '#4c0080' }
-    ,
+    color: '#4c0080' 
+  },
 });
 
 export default EditActivity;

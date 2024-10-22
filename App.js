@@ -10,6 +10,7 @@ import Diet from './Screens/Diet';
 import AddActivity from './Screens/AddActivity';
 import AddDietEntry from './Screens/AddDietEntry';
 import EditActivity from './Screens/EditActivity';
+import EditDietEntry from './Screens/EditDietEntry';
 import Settings from './Screens/Settings';
 import { ActivityProvider } from './Context/ActivityContext'; // Import ActivityProvider
 import { DietProvider } from './Context/DietContext';
@@ -53,8 +54,8 @@ const AppNavigator = () => {
       <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="AddActivity" component={AddActivity} options={{ title: 'Add Activity' }} />
       <Stack.Screen name="AddDietEntry" component={AddDietEntry} options={{ title: 'Add Diet Entry' }} />
-      <Stack.Screen name="EditActivity" component={EditActivity}  options={{ title: 'Edit Activity' }} 
-/>
+      <Stack.Screen name="EditActivity" component={EditActivity}  options={{ title: 'Edit Activity' }} />
+      <Stack.Screen name="EditDietEntry" component={EditDietEntry} options={{ title: 'Edit Diet Entry' }} />
     </Stack.Navigator>
   );
 };

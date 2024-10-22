@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // For icons
 import { ThemeContext } from '../Context/ThemeContext';
 import ItemsList from '../Components/ItemsList'; // Import ItemsList
@@ -28,25 +28,30 @@ const Diet = ({ navigation }) => {
     }
   };
 
+  // Function to handle when an entry is tapped for editing
+  const handleEditDietEntry = (dietEntry) => {
+    navigation.navigate('EditDietEntry', { dietEntry }); // Navigate to EditDietEntry screen with the selected entry
+  };
+
   // Set header and "Add" button
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={styles.headerIconsContainer}>
-        <Pressable
-          onPress={() => navigation.navigate('AddDietEntry')}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
-              paddingHorizontal: 0,
-              paddingVertical: 5,
-              borderRadius: 5,
-            },
-          ]}
-        >
-          <Ionicons name="add" size={24} color={commonStyles.whiteColor} />
-        </Pressable>
-        <Pressable
+          <Pressable
+            onPress={() => navigation.navigate('AddDietEntry')}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? commonStyles.secondaryColor : 'transparent',
+                paddingHorizontal: 0,
+                paddingVertical: 5,
+                borderRadius: 5,
+              },
+            ]}
+          >
+            <Ionicons name="add" size={24} color={commonStyles.whiteColor} />
+          </Pressable>
+          <Pressable
             onPress={() => navigation.navigate('DietProfile')}
             style={({ pressed }) => [
               {
@@ -76,6 +81,7 @@ const Diet = ({ navigation }) => {
         entries={dietEntries} 
         type="diet" 
         onDelete={handleDeleteDietEntry} // Pass delete function to ItemsList
+        onEdit={handleEditDietEntry} // Pass edit function to ItemsList
       />
     </View>
   );

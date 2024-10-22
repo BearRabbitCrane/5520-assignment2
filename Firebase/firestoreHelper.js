@@ -115,3 +115,14 @@ export function listenToDietEntries(callback) {
     callback(dietEntries); // Pass the diet entries data to the callback function
   });
 }
+
+// Function to update a diet entry in Firestore
+export async function updateDietEntryInDB(entryId, updatedData) {
+  try {
+    const dietRef = doc(database, 'dietEntries', entryId);
+    await updateDoc(dietRef, updatedData);
+  } catch (error) {
+    console.error('Error updating diet entry:', error);
+    throw error;
+  }
+}

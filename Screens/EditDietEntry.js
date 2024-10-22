@@ -1,17 +1,30 @@
 import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import PressableButton from '../Components/PressableButton';  
-import DatePicker from '../Components/DatePicker';  
-import InputField from '../Components/InputField';  
+import PressableButton from '../Components/PressableButton';
+import DatePicker from '../Components/DatePicker';
+import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
-import { addDietEntryToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
+import { updateDietEntryInDB } from '../Firebase/firestoreHelper'; // Firestore helper function
 
-const AddDietEntry = ({ navigation }) => {
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const EditDietEntry = ({ route, navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
+  const { dietEntry } = route.params; // Receive diet entry details from route params
   
-  const [description, setDescription] = useState(''); 
-  const [calories, setCalories] = useState('');
-  const [date, setDate] = useState(new Date());
+  // State to store form inputs
+  const [description, setDescription] = useState(dietEntry.description);
+  const [calories, setCalories] = useState(dietEntry.calories.toString());
+  
+  // Parse the incoming date as YYYY-MM-DD
+  const [date, setDate] = useState(new Date(dietEntry.date));
+  
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
 
@@ -29,28 +42,31 @@ const AddDietEntry = ({ navigation }) => {
     const caloriesNumber = parseInt(calories, 10);
     const isSpecial = caloriesNumber > 800;
 
-    const dietData = {
+    // Format the selected date to store only YYYY-MM-DD
+    const formattedDate = formatDate(date);
+
+    const updatedDietData = {
       description,
       calories: caloriesNumber,
-      date: date.toISOString(),
+      date: formattedDate, // Store only the date (YYYY-MM-DD)
       isSpecial
     };
 
     try {
-      const docId = await addDietEntryToDB(dietData); // Add diet entry to Firestore and get the generated ID
-      console.log('New diet entry added with ID:', docId);
-
-      Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      await updateDietEntryInDB(dietEntry.id, updatedDietData); // Update the diet entry in Firestore
+      Alert.alert('Success', 'Diet entry updated successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
     } catch (error) {
-      console.error('Failed to save diet entry:', error);
-      Alert.alert('Error', 'Failed to save the diet entry. Please try again.');
+      console.error('Failed to update diet entry:', error);
+      Alert.alert('Error', 'Failed to update the diet entry. Please try again.');
     }
   };
 
+  // Set header styles
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: headerColor },
-      headerTitleStyle: { color: textColor }
+      headerTitleStyle: { color: textColor },
+      title: 'Edit Diet Entry',
     });
   }, [navigation, headerColor, textColor]);
 
@@ -81,6 +97,7 @@ const AddDietEntry = ({ navigation }) => {
           ref={caloriesFieldRef}
         />
 
+        {/* Pass the parsed date to DatePicker */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
       </View>
 
@@ -107,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddDietEntry;
+export default EditDietEntry;
