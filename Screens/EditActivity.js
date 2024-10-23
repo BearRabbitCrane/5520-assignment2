@@ -28,7 +28,8 @@ const EditActivity = ({ route, navigation }) => {
   // Pre-populate the date with the activity's date
   const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
   
-  const [isSpecial, setIsSpecial] = useState(activity.isSpecial);  // Checkbox for special entry
+  // Set the default checkbox state to false (unchecked)
+  const [isSpecial, setIsSpecial] = useState(false);  // Default unchecked state
   const durationFieldRef = useRef();
 
   const validateAndSave = async () => {
@@ -52,7 +53,7 @@ const EditActivity = ({ route, navigation }) => {
       activityType,
       duration: durationNumber,
       date: date.toISOString(), // Convert date to ISO string for storage
-      isSpecial: isSpecial // Save updated special state
+      isSpecial: isSpecial // Save updated special state (user can check it manually)
     };
 
     try {
@@ -105,17 +106,19 @@ const EditActivity = ({ route, navigation }) => {
         {/* Pre-populate date with the date from activity */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
-        {/* Checkbox to toggle special state */}
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            value={isSpecial}
-            onValueChange={setIsSpecial} // Toggle special state
-            tintColors={{ true: '#4c0080', false: '#000' }}
-          />
-          <Text style={[styles.specialText]}>
-            This item is marked as special. Select the checkbox if you would like to approve it.
-          </Text>
-        </View>
+        {/* Conditionally render checkbox only if the entry is special */}
+        {activity.isSpecial && (
+          <View style={styles.checkboxContainer}>
+            <CheckBox
+              value={isSpecial}  // Initially false (unchecked)
+              onValueChange={setIsSpecial} // Toggle special state
+              tintColors={{ true: '#4c0080', false: '#000' }}
+            />
+            <Text style={[styles.specialText]}>
+              This item is marked as special. Select the checkbox if you would like to approve it.
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.buttonContainer}>
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 300,  // Adjust this margin for better spacing
+    marginTop: 300,
   },
   specialText: {
     fontSize: 16,

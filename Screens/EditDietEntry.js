@@ -18,8 +18,8 @@ const EditDietEntry = ({ route, navigation }) => {
   // Parse the incoming date as YYYY-MM-DD
   const [date, setDate] = useState(new Date(dietEntry.date));
   
-  // Checkbox for special entry
-  const [isSpecial, setIsSpecial] = useState(dietEntry.isSpecial);  
+  // Set the default checkbox state to false (unchecked)
+  const [isSpecial, setIsSpecial] = useState(false);  // Default unchecked state
   
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
@@ -110,17 +110,19 @@ const EditDietEntry = ({ route, navigation }) => {
         {/* Pass the parsed date to DatePicker */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
-        {/* Checkbox to toggle special state */}
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            value={isSpecial}
-            onValueChange={setIsSpecial} // Toggle special state
-            tintColors={{ true: '#4c0080', false: '#000' }}
-          />
-          <Text style={[styles.specialText]}>
-            This item is marked as special. Select the checkbox if you would like to approve it.
-          </Text>
-        </View>
+        {/* Conditionally render checkbox only if the entry is special */}
+        {dietEntry.isSpecial && (
+          <View style={styles.checkboxContainer}>
+            <CheckBox
+              value={isSpecial}  // Initially false (unchecked)
+              onValueChange={setIsSpecial} // Toggle special state
+              tintColors={{ true: '#4c0080', false: '#000' }}
+            />
+            <Text style={[styles.specialText]}>
+              This item is marked as special. Select the checkbox if you would like to approve it.
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.buttonContainer}>
