@@ -1,5 +1,6 @@
 import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Alert, Text } from 'react-native';
+import CheckBox from 'expo-checkbox';  // Import CheckBox component
 import PressableButton from '../Components/PressableButton';
 import DatePicker from '../Components/DatePicker';
 import InputField from '../Components/InputField';
@@ -26,28 +27,11 @@ const EditActivity = ({ route, navigation }) => {
   
   // Pre-populate the date with the activity's date
   const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
+  
+  const [isSpecial, setIsSpecial] = useState(activity.isSpecial);  // Checkbox for special entry
   const durationFieldRef = useRef();
 
-  const confirmSave = () => {
-    Alert.alert(
-      "Important",
-      "Are you sure you want to save these changes?",
-      [
-        {
-          text: "No",
-          onPress: () => console.log("Save cancelled"),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: handleSave, // Call the save function when user confirms
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handleSave = async () => {
+  const validateAndSave = async () => {
     if (!durationFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
@@ -68,6 +52,7 @@ const EditActivity = ({ route, navigation }) => {
       activityType,
       duration: durationNumber,
       date: date.toISOString(), // Convert date to ISO string for storage
+      isSpecial: isSpecial // Save updated special state
     };
 
     try {
@@ -119,12 +104,23 @@ const EditActivity = ({ route, navigation }) => {
 
         {/* Pre-populate date with the date from activity */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+
+        {/* Checkbox to toggle special state */}
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={isSpecial}
+            onValueChange={setIsSpecial} // Toggle special state
+            tintColors={{ true: '#4c0080', false: '#000' }}
+          />
+          <Text style={[styles.specialText]}>
+            This item is marked as special. Select the checkbox if you would like to approve it.
+          </Text>
+        </View>
       </View>
 
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
-        {/* Use the confirmSave function to show the alert when saving */}
-        <PressableButton title="Save" onPress={confirmSave} type="primary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
       </View>
     </View>
   );
@@ -153,6 +149,16 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     fontWeight: '400', 
     color: '#4c0080' 
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 300,  // Adjust this margin for better spacing
+  },
+  specialText: {
+    fontSize: 16,
+    marginLeft: 10,
+    color: '#4c0080',
   },
 });
 

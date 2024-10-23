@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.3",
     "@firebase/firestore": "^4.7.4",
+    "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-firebase/app": "^21.0.0",
     "@react-native-firebase/firestore": "^21.0.0",
@@ -23,7 +24,8 @@
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-dotenv": "^3.4.11",
-    "react-native-dropdown-picker": "^5.4.6"
+    "react-native-dropdown-picker": "^5.4.6",
+    "expo-checkbox": "~3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
