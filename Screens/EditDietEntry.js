@@ -1,11 +1,12 @@
 import React, { useState, useRef, useContext } from 'react';
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, StyleSheet, Alert, Text, Pressable } from 'react-native';
 import CheckBox from 'expo-checkbox';  // Import CheckBox component
+import { Ionicons } from '@expo/vector-icons';  // Import Ionicons for trash icon
 import PressableButton from '../Components/PressableButton';
 import DatePicker from '../Components/DatePicker';
 import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
-import { updateDietEntryInDB } from '../Firebase/firestoreHelper'; // Firestore helper function
+import { updateDietEntryInDB, deleteDietEntryFromDB } from '../Firebase/firestoreHelper'; // Import Firestore helper functions
 
 const EditDietEntry = ({ route, navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
@@ -18,8 +19,8 @@ const EditDietEntry = ({ route, navigation }) => {
   // Parse the incoming date as YYYY-MM-DD
   const [date, setDate] = useState(new Date(dietEntry.date));
   
-  // Set the default checkbox state to false (unchecked)
-  const [isSpecial, setIsSpecial] = useState(false);  // Default unchecked state
+  // Checkbox for special entry
+  const [isSpecial, setIsSpecial] = useState(false);   // Default unchecked state
   
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
@@ -71,12 +72,44 @@ const EditDietEntry = ({ route, navigation }) => {
     );
   };
 
-  // Set header styles
+  const handleDelete = () => {
+    // Show delete confirmation alert
+    Alert.alert(
+      'Delete',
+      'Are you sure you want to delete this item?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              await deleteDietEntryFromDB(dietEntry.id); // Delete from Firestore
+              Alert.alert('Deleted', 'The item has been deleted successfully.');
+              navigation.goBack();
+            } catch (error) {
+              console.error('Error deleting entry:', error);
+              Alert.alert('Error', 'Failed to delete the entry.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Set header styles, including the delete icon
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: headerColor },
       headerTitleStyle: { color: textColor },
       title: 'Edit Diet Entry',
+      // Add a trash icon to the right side of the header
+      headerRight: () => (
+        <View style={{ paddingRight: 15 }}>
+        <Pressable onPress={handleDelete}>
+          <Ionicons name="trash-outline" size={24} color={textColor} />
+        </Pressable>
+        </View>
+      ),
     });
   }, [navigation, headerColor, textColor]);
 
@@ -110,19 +143,17 @@ const EditDietEntry = ({ route, navigation }) => {
         {/* Pass the parsed date to DatePicker */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
-        {/* Conditionally render checkbox only if the entry is special */}
-        {dietEntry.isSpecial && (
-          <View style={styles.checkboxContainer}>
-            <CheckBox
-              value={isSpecial}  // Initially false (unchecked)
-              onValueChange={setIsSpecial} // Toggle special state
-              tintColors={{ true: '#4c0080', false: '#000' }}
-            />
-            <Text style={[styles.specialText]}>
-              This item is marked as special. Select the checkbox if you would like to approve it.
-            </Text>
-          </View>
-        )}
+        {/* Checkbox to toggle special state */}
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={isSpecial}
+            onValueChange={setIsSpecial} // Toggle special state
+            tintColors={{ true: '#4c0080', false: '#000' }}
+          />
+          <Text style={[styles.specialText]}>
+            This item is marked as special. Select the checkbox if you would like to approve it.
+          </Text>
+        </View>
       </View>
 
       <View style={styles.buttonContainer}>

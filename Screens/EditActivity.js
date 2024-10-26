@@ -1,11 +1,12 @@
 import React, { useState, useRef, useContext } from 'react';
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, StyleSheet, Alert, Text, Pressable } from 'react-native';
 import CheckBox from 'expo-checkbox';  // Import CheckBox component
+import { Ionicons } from '@expo/vector-icons';  // Import Ionicons for trash icon
 import PressableButton from '../Components/PressableButton';
 import DatePicker from '../Components/DatePicker';
 import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
-import { updateActivityInDB } from '../Firebase/firestoreHelper'; // Firestore helper function
+import { updateActivityInDB, deleteActivityFromDB } from '../Firebase/firestoreHelper'; // Import Firestore helper functions
 import DropDownPicker from 'react-native-dropdown-picker';
 
 const EditActivity = ({ route, navigation }) => {
@@ -28,8 +29,7 @@ const EditActivity = ({ route, navigation }) => {
   // Pre-populate the date with the activity's date
   const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
   
-  // Set the default checkbox state to false (unchecked)
-  const [isSpecial, setIsSpecial] = useState(false);  // Default unchecked state
+  const [isSpecial, setIsSpecial] = useState(false);  // Checkbox for special entry
   const durationFieldRef = useRef();
 
   const validateAndSave = async () => {
@@ -53,25 +53,74 @@ const EditActivity = ({ route, navigation }) => {
       activityType,
       duration: durationNumber,
       date: date.toISOString(), // Convert date to ISO string for storage
-      isSpecial: isSpecial // Save updated special state (user can check it manually)
+      isSpecial: isSpecial // Save updated special state
     };
 
-    try {
-      await updateActivityInDB(activity.id, updatedActivity); // Update activity in Firestore
-      Alert.alert('Success', 'Activity updated successfully!');
-      navigation.goBack();
-    } catch (error) {
-      console.error('Failed to update activity:', error);
-      Alert.alert('Error', 'Failed to update the activity. Please try again.');
-    }
+    // Confirmation before saving
+    Alert.alert(
+      'Important',
+      'Are you sure you want to save these changes?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              await updateActivityInDB(activity.id, updatedActivity); // Update activity in Firestore
+              Alert.alert('Success', 'Activity updated successfully!', [
+                { text: 'OK', onPress: () => navigation.goBack() },
+              ]);
+            } catch (error) {
+              console.error('Failed to update activity:', error);
+              Alert.alert('Error', 'Failed to update the activity. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
-  // Set header styles
+  const handleDelete = () => {
+    // Show delete confirmation alert
+    Alert.alert(
+      'Delete',
+      'Are you sure you want to delete this item?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              await deleteActivityFromDB(activity.id); // Delete from Firestore
+              Alert.alert('Deleted', 'The item has been deleted successfully.');
+              navigation.goBack();
+            } catch (error) {
+              console.error('Error deleting entry:', error);
+              Alert.alert('Error', 'Failed to delete the entry.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Set header styles, including the delete icon
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: headerColor },
       headerTitleStyle: { color: textColor },
       title: 'Edit Activity',
+      // Add a trash icon to the right side of the header
+      headerRight: () => (
+        <View style={{ paddingRight: 15 }}>
+        <Pressable onPress={handleDelete}>
+          <Ionicons name="trash-outline" size={24} color={textColor} />
+        </Pressable>
+        </View>
+      ),
     });
   }, [navigation, headerColor, textColor]);
 
@@ -106,18 +155,19 @@ const EditActivity = ({ route, navigation }) => {
         {/* Pre-populate date with the date from activity */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
+        {/* Checkbox to toggle special state */}
         {/* Conditionally render checkbox only if the entry is special */}
         {activity.isSpecial && (
-          <View style={styles.checkboxContainer}>
-            <CheckBox
-              value={isSpecial}  // Initially false (unchecked)
-              onValueChange={setIsSpecial} // Toggle special state
-              tintColors={{ true: '#4c0080', false: '#000' }}
-            />
-            <Text style={[styles.specialText]}>
-              This item is marked as special. Select the checkbox if you would like to approve it.
-            </Text>
-          </View>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={isSpecial}
+            onValueChange={setIsSpecial} // Toggle special state
+            tintColors={{ true: '#4c0080', false: '#000' }}
+          />
+          <Text style={[styles.specialText]}>
+            This item is marked as special. Select the checkbox if you would like to approve it.
+          </Text>
+        </View>
         )}
       </View>
 
@@ -137,12 +187,6 @@ const styles = StyleSheet.create({
   contentContainer: { 
     flex: 1 
   },
-  label: { 
-    fontSize: 18, 
-    marginBottom: 10, 
-    fontWeight: '500', 
-    color: '#4c0080' 
-  },
   buttonContainer: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
@@ -156,7 +200,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 300,
+    marginTop: 300,  // Adjust this margin for better spacing
   },
   specialText: {
     fontSize: 16,
