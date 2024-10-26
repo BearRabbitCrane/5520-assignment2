@@ -19,13 +19,17 @@ const EditDietEntry = ({ route, navigation }) => {
   // Parse the incoming date as YYYY-MM-DD
   const [date, setDate] = useState(new Date(dietEntry.date));
   
-  // Checkbox for special entry
-  const [isSpecial, setIsSpecial] = useState(false);   // Default unchecked state
+  // Set the checkbox visual state to false, while `isSpecial` reflects the true special status
+  const [isSpecial, setIsSpecial] = useState(dietEntry.isSpecial);
+  const [isChecked, setIsChecked] = useState(false); // Visually unchecked initially
   
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
 
   const validateAndSave = async () => {
+    // Update `isSpecial` only if the user has interacted with the checkbox
+    const updatedSpecialState = isChecked ? false : isSpecial;
+
     if (!descriptionFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid description.');
       return;
@@ -42,7 +46,7 @@ const EditDietEntry = ({ route, navigation }) => {
       description,
       calories: caloriesNumber,
       date: date,
-      isSpecial: isSpecial // Save updated special state
+      isSpecial: isChecked ? false : isSpecial // Save updated special state
     };
 
     // Confirmation before saving
@@ -144,17 +148,23 @@ const EditDietEntry = ({ route, navigation }) => {
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
         {/* Checkbox to toggle special state */}
+        {dietEntry.isSpecial && (
         <View style={styles.checkboxContainer}>
           <CheckBox
-            value={isSpecial}
-            onValueChange={setIsSpecial} // Toggle special state
+            value={isChecked}  // Initially false, toggled visually
+            onValueChange={(newValue) => {
+              setIsChecked(newValue);
+              console.log("Checkbox visually toggled, isChecked is now:", newValue);
+            }}
             tintColors={{ true: '#4c0080', false: '#000' }}
           />
           <Text style={[styles.specialText]}>
             This item is marked as special. Select the checkbox if you would like to approve it.
           </Text>
         </View>
+        )}
       </View>
+      
 
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />

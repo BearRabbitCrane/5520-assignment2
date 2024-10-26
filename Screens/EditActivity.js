@@ -29,10 +29,15 @@ const EditActivity = ({ route, navigation }) => {
   // Pre-populate the date with the activity's date
   const [date, setDate] = useState(activity.date ? new Date(activity.date) : new Date());
   
-  const [isSpecial, setIsSpecial] = useState(false);  // Checkbox for special entry
+ // Set the checkbox visual state to false, while `isSpecial` reflects the true special status
+  const [isSpecial, setIsSpecial] = useState(activity.isSpecial);
+  const [isChecked, setIsChecked] = useState(false); // Visually unchecked initially
   const durationFieldRef = useRef();
 
   const validateAndSave = async () => {
+    // Update `isSpecial` only if the user has interacted with the checkbox
+    const updatedSpecialState = isChecked ? false : isSpecial;
+
     if (!durationFieldRef.current.validate()) {
       Alert.alert('Invalid Input', 'Please provide a valid duration.');
       return;
@@ -53,7 +58,7 @@ const EditActivity = ({ route, navigation }) => {
       activityType,
       duration: durationNumber,
       date: date.toISOString(), // Convert date to ISO string for storage
-      isSpecial: isSpecial // Save updated special state
+      isSpecial: isChecked ? false : isSpecial // Save updated special state
     };
 
     // Confirmation before saving
@@ -160,8 +165,11 @@ const EditActivity = ({ route, navigation }) => {
         {activity.isSpecial && (
         <View style={styles.checkboxContainer}>
           <CheckBox
-            value={isSpecial}
-            onValueChange={setIsSpecial} // Toggle special state
+            value={isChecked}
+            onValueChange={(newValue) => {
+              setIsChecked(newValue);
+              console.log("Checkbox toggled, isChecked is now:", newValue);
+            }} // Toggle special state
             tintColors={{ true: '#4c0080', false: '#000' }}
           />
           <Text style={[styles.specialText]}>
