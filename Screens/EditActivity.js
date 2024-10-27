@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Alert, Text, Pressable } from 'react-native';
 import CheckBox from 'expo-checkbox';  // Import CheckBox component
@@ -214,6 +215,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     color: '#4c0080',
+  },
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
   },
 });
 

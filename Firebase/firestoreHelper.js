@@ -94,7 +94,7 @@ export async function addDietEntryToDB(dietData) {
 // Function to delete a diet entry
 export async function deleteDietEntryFromDB(entryId) {
   try {
-    await deleteDoc(doc(database, 'diet', entryId));
+    await deleteDoc(doc(database, 'dietEntries', entryId));
   } catch (error) {
     console.error('Error deleting diet entry: ', error);
     throw error;
@@ -123,6 +123,24 @@ export async function updateDietEntryInDB(entryId, updatedData) {
     await updateDoc(dietRef, updatedData);
   } catch (error) {
     console.error('Error updating diet entry:', error);
+    throw error;
+  }
+}
+
+// Function to fetch a single activity by its ID
+export async function fetchActivityById(activityId) {
+  try {
+    const docRef = doc(database, 'activities', activityId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching activity:', error);
     throw error;
   }
 }

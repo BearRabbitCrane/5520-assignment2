@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Alert, Text, Pressable } from 'react-native';
 import CheckBox from 'expo-checkbox';  // Import CheckBox component
@@ -8,21 +9,19 @@ import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
 import { updateDietEntryInDB, deleteDietEntryFromDB } from '../Firebase/firestoreHelper'; // Import Firestore helper functions
 
-const EditDietEntry = ({ route, navigation }) => {
+const EditActivity = ({ route, navigation }) => {
   const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
-  const { dietEntry } = route.params; // Receive diet entry details from route params
+  const { dietEntry } = route.params; // Receive diet details from route params
   
-  // State to store form inputs
   const [description, setDescription] = useState(dietEntry.description);
   const [calories, setCalories] = useState(dietEntry.calories.toString());
   
-  // Parse the incoming date as YYYY-MM-DD
-  const [date, setDate] = useState(new Date(dietEntry.date));
+  // Pre-populate the date with the activity's date
+  const [date, setDate] = useState(dietEntry.date ? new Date(dietEntry.date) : new Date());
   
-  // Set the checkbox visual state to false, while `isSpecial` reflects the true special status
+ // Set the checkbox visual state to false, while `isSpecial` reflects the true special status
   const [isSpecial, setIsSpecial] = useState(dietEntry.isSpecial);
   const [isChecked, setIsChecked] = useState(false); // Visually unchecked initially
-  
   const descriptionFieldRef = useRef();
   const caloriesFieldRef = useRef();
 
@@ -45,7 +44,7 @@ const EditDietEntry = ({ route, navigation }) => {
     const updatedDietData = {
       description,
       calories: caloriesNumber,
-      date: date,
+      date: date.toISOString(), // Convert date to ISO string for storage
       isSpecial: isChecked ? false : isSpecial // Save updated special state
     };
 
@@ -62,13 +61,13 @@ const EditDietEntry = ({ route, navigation }) => {
           text: 'Yes',
           onPress: async () => {
             try {
-              await updateDietEntryInDB(dietEntry.id, updatedDietData); // Update the diet entry in Firestore
+              await updateDietEntryInDB(dietEntry.id, updatedDietData); // Update diet in Firestore
               Alert.alert('Success', 'Diet entry updated successfully!', [
                 { text: 'OK', onPress: () => navigation.goBack() },
               ]);
             } catch (error) {
-              console.error('Failed to update diet entry:', error);
-              Alert.alert('Error', 'Failed to update the diet entry. Please try again.');
+              console.error('Failed to update Diet entry:', error);
+              Alert.alert('Error', 'Failed to update the Diet entry. Please try again.');
             }
           },
         },
@@ -120,7 +119,7 @@ const EditDietEntry = ({ route, navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.contentContainer}>
-        <InputField
+      <InputField
           label="Description *"
           placeholder="Enter description"
           value={description}
@@ -144,18 +143,19 @@ const EditDietEntry = ({ route, navigation }) => {
           ref={caloriesFieldRef}
         />
 
-        {/* Pass the parsed date to DatePicker */}
+        {/* Pre-populate date with the date from activity */}
         <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
 
         {/* Checkbox to toggle special state */}
+        {/* Conditionally render checkbox only if the entry is special */}
         {dietEntry.isSpecial && (
         <View style={styles.checkboxContainer}>
           <CheckBox
-            value={isChecked}  // Initially false, toggled visually
+            value={isChecked}
             onValueChange={(newValue) => {
               setIsChecked(newValue);
-              console.log("Checkbox visually toggled, isChecked is now:", newValue);
-            }}
+              console.log("Checkbox toggled, isChecked is now:", newValue);
+            }} // Toggle special state
             tintColors={{ true: '#4c0080', false: '#000' }}
           />
           <Text style={[styles.specialText]}>
@@ -164,7 +164,6 @@ const EditDietEntry = ({ route, navigation }) => {
         </View>
         )}
       </View>
-      
 
       <View style={styles.buttonContainer}>
         <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
@@ -185,18 +184,29 @@ const styles = StyleSheet.create({
   buttonContainer: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    marginBottom: 30 
+    marginBottom: 40 
+  },
+  dropdowninput: { 
+    fontSize: 18, 
+    fontWeight: '400', 
+    color: '#4c0080' 
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 260,
+    marginTop: 250,  // Adjust this margin for better spacing
   },
   specialText: {
     fontSize: 16,
     marginLeft: 10,
     color: '#4c0080',
   },
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
+  },
 });
 
-export default EditDietEntry;
+export default EditActivity;

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useContext } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import PressableButton from '../Components/PressableButton';  
-import DatePicker from '../Components/DatePicker';  
-import InputField from '../Components/InputField';  
+import { View, StyleSheet, Alert, Text } from 'react-native';
+import PressableButton from '../Components/PressableButton';
+import DatePicker from '../Components/DatePicker';
+import InputField from '../Components/InputField';
 import { ThemeContext } from '../Context/ThemeContext';
 import { addDietEntryToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
 
@@ -51,13 +51,15 @@ const AddDietEntry = ({ navigation }) => {
       const docId = await addDietEntryToDB(dietData); // Add diet entry to Firestore and get the generated ID
       console.log('New diet entry added with ID:', docId);
 
-      Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      Alert.alert('Success', 'Diet entry saved successfully!');
+      navigation.goBack();
     } catch (error) {
       console.error('Failed to save diet entry:', error);
-      Alert.alert('Error', 'Failed to save the diet entry. Please try again.');
+      Alert.alert('Error', 'Failed to save the activity. Please try again.');
     }
   };
 
+  // Set header styles
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: headerColor },
@@ -68,7 +70,7 @@ const AddDietEntry = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.contentContainer}>
-        <InputField
+      <InputField
           label="Description *"
           placeholder="Enter description"
           value={description}
@@ -111,11 +113,22 @@ const styles = StyleSheet.create({
   contentContainer: { 
     flex: 1 
   },
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
+  },
   buttonContainer: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    marginBottom: 30 
+    marginBottom: 40 
   },
+  dropdowninput: { 
+    fontSize: 18, 
+    fontWeight: '400', 
+    color: '#4c0080' }
+    ,
 });
 
 export default AddDietEntry;
