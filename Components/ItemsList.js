@@ -1,50 +1,62 @@
-// Components/ItemsList.js
 import React from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
-import commonStyles from '../Helpers/styles'; // Import common styles
+import { FlatList, View, Text, StyleSheet, Pressable } from 'react-native';
+import commonStyles from '../Helpers/styles';  // Assuming you have common styles
 
-// ItemsList component to display list items for both Activities and Diet
-const ItemsList = ({ entries, type }) => {
+// Helper function to format the date with day and avoid timezone issues
+const formatDateWithoutTimezoneIssue = (date) => {
+  const parsedDate = new Date(date);
+  
+  // This ensures the correct formatting (e.g., Fri, Oct 11, 2024)
+  return parsedDate.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC', // Ensure it interprets the date as UTC
+  });
+};
+
+const ItemsList = ({ entries, type, onEdit }) => {
+  console.log('Rendering ItemsList with entries:', entries);  // Log the entries passed to ItemsList
   const renderItem = ({ item }) => (
-    <View style={styles.entryCard}>
-      <View style={styles.entryNameContainer}>
-        <Text style={styles.entryName}>
-          {type === 'activity' ? item.activityType : item.description} 
-        </Text>
-        {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
-      </View>
-      <View style={styles.entryInfo}>
-        <View style={[styles.infoBox, { width: 145 }]}> 
-          <Text style={styles.infoText}>
-            {new Date(item.date).toLocaleDateString('en-US', {
-              weekday: 'short', // e.g., Mon
-              year: 'numeric',
-              month: 'short',  // e.g., Sep
-              day: 'numeric',
-            })}
+    <Pressable onPress={() => onEdit(item)} style={styles.pressableItem}>
+      <View style={styles.entryCard}>
+        <View style={styles.entryNameContainer}>
+          <Text style={styles.entryName}>
+            {type === 'activity' ? item.activityType : item.description}
           </Text>
+          {item.isSpecial && <Text style={styles.specialIcon}>⚠️</Text>}
         </View>
-        <View style={[styles.infoBox, { width: 75 }]}>
-          <Text style={styles.infoText}>
-            {type === 'activity' ? `${item.duration} min` : `${item.calories} kcal`}
-          </Text>
+        <View style={styles.entryInfo}>
+          <View style={[styles.infoBox, { width: 145 }]}>
+            <Text style={styles.infoText}>
+              {formatDateWithoutTimezoneIssue(item.date)} {/* Correctly format the date */}
+            </Text>
+          </View>
+          <View style={[styles.infoBox, { width: 75 }]}>
+            <Text style={styles.infoText}>
+              {type === 'activity' ? `${item.duration} min` : `${item.calories} kcal`}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
     <FlatList
       data={entries}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}  // Make sure each entry has a unique ID
       renderItem={renderItem}
     />
   );
 };
 
-// Define styles for the ItemsList component
 const styles = StyleSheet.create({
-  ...commonStyles, // Import shared/common styles
+  ...commonStyles,
+  pressableItem: {
+    marginBottom: 10,
+  },
   entryCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -52,7 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: commonStyles.primaryColor,
     borderRadius: 8,
     padding: 15,
-    marginBottom: 15,
   },
   entryNameContainer: {
     flexDirection: 'row',
@@ -68,7 +79,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 5,
     marginLeft: 5,
-    alignItems: 'center', 
+    alignItems: 'center',
   },
   infoText: {
     color: commonStyles.blackColor,

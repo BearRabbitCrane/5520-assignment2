@@ -1,193 +1,134 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Pressable, Alert, Platform, StyleSheet } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { DietContext } from '../Context/DietContext'; // Import DietContext to manage diet entries
-import { ThemeContext } from '../Context/ThemeContext'; // Import ThemeContext for dynamic theming
+import React, { useState, useRef, useContext } from 'react';
+import { View, StyleSheet, Alert, Text } from 'react-native';
+import PressableButton from '../Components/PressableButton';
+import DatePicker from '../Components/DatePicker';
+import InputField from '../Components/InputField';
+import { ThemeContext } from '../Context/ThemeContext';
+import { addDietEntryToDB } from '../Firebase/firestoreHelper'; // Import Firestore helper function
+
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const AddDietEntry = ({ navigation }) => {
-  const { backgroundColor, textColor, headerColor, isDarkTheme } = useContext(ThemeContext); // Get theme values from ThemeContext
-  const { addDietEntry } = useContext(DietContext); // Access addDietEntry function from DietContext
+  const { backgroundColor, isDarkTheme, headerColor, textColor } = useContext(ThemeContext);
+  
+  const [description, setDescription] = useState(''); 
+  const [calories, setCalories] = useState('');
+  const [date, setDate] = useState(new Date());
+  const descriptionFieldRef = useRef();
+  const caloriesFieldRef = useRef();
 
-  // Local state to manage diet entry input values
-  const [description, setDescription] = useState(''); // Description of the diet entry
-  const [calories, setCalories] = useState(''); // Calories input
-  const [date, setDate] = useState(new Date()); // Date selected for the diet entry
-  const [showDatePicker, setShowDatePicker] = useState(false); // Control visibility of DateTimePicker
-
-  // Handle changes when a new date is selected from DateTimePicker
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false); // Hide DateTimePicker after a date is selected
-    setDate(currentDate); // Update date state
-  };
-
-  // Function to validate user input and save the diet entry
-  const validateAndSave = () => {
-    const caloriesNumber = parseInt(calories, 10); // Parse calories input to an integer
-    if (!description.trim()) {
-      Alert.alert('Invalid Input', 'Please enter a valid description.'); // Show error if description is empty
+  const validateAndSave = async () => {
+    if (!descriptionFieldRef.current.validate()) {
+      Alert.alert('Invalid Input', 'Please provide a valid description.');
       return;
     }
-    if (isNaN(caloriesNumber) || caloriesNumber <= 0) {
-      Alert.alert('Invalid Input', 'Please enter a valid positive number for calories.'); // Show error for invalid calories
+
+    if (!caloriesFieldRef.current.validate()) {
+      Alert.alert('Invalid Input', 'Please provide a valid calorie count.');
       return;
     }
-    let isSpecial = caloriesNumber > 800; // Mark diet entry as special if calories > 800
-    addDietEntry(description, caloriesNumber, date, isSpecial); // Add the diet entry using the context function
-    Alert.alert('Success', 'Diet entry saved successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]); // Navigate back after success
+
+    const caloriesNumber = parseInt(calories, 10);
+    const isSpecial = caloriesNumber > 800;
+
+    try {
+      // Format date without time
+      const formattedDate = formatDate(date);
+
+      const dietData = {
+        description,
+        calories: caloriesNumber,
+        date: formattedDate, // Only save the formatted date (YYYY-MM-DD)
+        isSpecial
+      };
+
+      const docId = await addDietEntryToDB(dietData); // Add diet entry to Firestore and get the generated ID
+      console.log('New diet entry added with ID:', docId);
+
+      Alert.alert('Success', 'Diet entry saved successfully!');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Failed to save diet entry:', error);
+      Alert.alert('Error', 'Failed to save the activity. Please try again.');
+    }
   };
 
-  // Handle cancel action
-  const handleCancel = () => {
-    navigation.goBack(); // Go back to the previous screen
-  };
-
-  // Set dynamic header styles based on the current theme
+  // Set header styles
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: headerColor, // Header background color based on theme
-      },
-      headerTitleStyle: {
-        color: textColor, // Header text color based on theme
-      },
+      headerStyle: { backgroundColor: headerColor },
+      headerTitleStyle: { color: textColor }
     });
-  }, [navigation, headerColor, textColor]); // Trigger when navigation or theme values change
+  }, [navigation, headerColor, textColor]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {/* Description Input */}
-      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Description *:</Text>
-      <TextInput
-        style={[styles.input, styles.descriptionInput]} // Style for multiline input
-        placeholder="Enter description"
-        value={description}
-        onChangeText={setDescription}
-        placeholderTextColor={textColor} // Placeholder text color based on theme
-        multiline={true} // Enable multiline input
-        textAlignVertical="top" // Align text to the top for multiline input
-      />
-
-      {/* Calories Input */}
-      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Calories *:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter calories"
-        keyboardType="numeric" // Ensure only numbers can be entered
-        value={calories}
-        onChangeText={setCalories}
-        placeholderTextColor={textColor} // Placeholder text color based on theme
-      />
-
-      {/* Date Picker */}
-      <Text style={[styles.text, isDarkTheme && { color: '#ffffff' }]}>Date *:</Text>
-      <TextInput
-        style={[styles.input]}
-        placeholder="Select date"
-        value={date.toLocaleDateString()} // Display selected date
-        editable={false} // Prevent manual editing of the date input
-        onPressIn={() => setShowDatePicker(true)} // Show DateTimePicker on press
-      />
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'} // Show inline picker on iOS
-          onChange={onDateChange} // Update date on selection
+      <View style={styles.contentContainer}>
+      <InputField
+          label="Description *"
+          placeholder="Enter description"
+          value={description}
+          onChangeText={setDescription}
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          multiline={true}
+          inputStyle={{ height: 120 }}
+          ref={descriptionFieldRef}
         />
-      )}
 
-      {/* Spacer to separate form inputs from buttons */}
-      <View style={styles.flexSpacer} />
+        <InputField
+          label="Calories *"
+          placeholder="Enter calories"
+          value={calories}
+          onChangeText={setCalories}
+          keyboardType="numeric"
+          isDarkTheme={isDarkTheme}
+          isRequired={true}
+          validateNumber={true}
+          ref={caloriesFieldRef}
+        />
 
-      {/* Cancel and Save Buttons */}
+        <DatePicker label="Date" date={date} setDate={setDate} isDarkTheme={isDarkTheme} />
+      </View>
+
       <View style={styles.buttonContainer}>
-        <Pressable
-          onPress={handleCancel}
-          style={({ pressed }) => [
-            styles.button,
-            pressed ? styles.pressedButton : styles.noBackgroundButton
-          ]}
-        >
-          {({ pressed }) => (
-            <Text style={[styles.buttonText, { color: pressed ? '#fff' : '#1E90FF' }]}>
-              Cancel
-            </Text>
-          )}
-        </Pressable>
-        <Pressable
-          onPress={validateAndSave}
-          style={({ pressed }) => [
-            styles.button,
-            pressed ? styles.pressedButton : styles.noBackgroundButton
-          ]}
-        >
-          {({ pressed }) => (
-            <Text style={[styles.buttonText, { color: pressed ? '#fff' : '#1E90FF' }]}>
-              Save
-            </Text>
-          )}
-        </Pressable>
+        <PressableButton title="Cancel" onPress={() => navigation.goBack()} type="secondary" />
+        <PressableButton title="Save" onPress={validateAndSave} type="primary" />
       </View>
     </View>
   );
 };
 
-// Styles for AddDietEntry screen
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
+  container: { 
+    flex: 1, 
+    padding: 20 
   },
-  text: {
-    fontSize: 18,
-    marginBottom: 10,
-    fontWeight: '500',
-    color: '#4c0080',
+  contentContainer: { 
+    flex: 1 
   },
-  input: {
-    borderWidth: 2,
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    borderColor: '#4c0080',
-    fontWeight: '400',
-    fontSize: 17,
-    color: '#4c0080',
-    backgroundColor: 'white',
+  label: { 
+    fontSize: 18, 
+    marginBottom: 10, 
+    fontWeight: '500', 
+    color: '#4c0080' 
   },
-  descriptionInput: { // Style for multiline description input
-    height: 130,
+  buttonContainer: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 40 
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 150,
-  },
-  flexSpacer: {
-    flex: 1,
-  },
-  button: {
-    width: '40%',
-    padding: 10,
-    alignItems: 'center',
-    borderRadius: 8,
-    elevation: 5,
-  },
-  noBackgroundButton: {
-    backgroundColor: 'transparent',
-  },
-  pressedButton: {
-    backgroundColor: '#1E90FF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  dropdowninput: { 
+    fontSize: 18, 
+    fontWeight: '400', 
+    color: '#4c0080' }
+    ,
 });
 
 export default AddDietEntry;
